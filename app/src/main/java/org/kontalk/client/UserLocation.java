@@ -22,7 +22,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.xmlpull.v1.XmlPullParser;
 
-
 /**
  * XEP-0080: User Location
  * http://xmpp.org/extensions/xep-0080.html
