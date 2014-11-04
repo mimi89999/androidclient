@@ -26,6 +26,7 @@ import org.kontalk.service.msgcenter.MessageCenterService;
 import org.kontalk.util.Preferences;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -34,9 +35,11 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.text.Html;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -48,6 +51,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +74,9 @@ public class ConversationListFragment extends ListFragment {
     private MenuItem mDeleteAllMenu;
     /** Offline mode menu item. */
     private MenuItem mOfflineMenu;
+
+    private SearchView mSearchView;
+    private SearchManager mSearchManager;
 
     private final ConversationListAdapter.OnContentChangedListener mContentChangedListener =
         new ConversationListAdapter.OnContentChangedListener() {
@@ -149,7 +156,11 @@ public class ConversationListFragment extends ListFragment {
         */
 
         // search
+        mSearchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         mSearchMenu = menu.findItem(R.id.menu_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(mSearchMenu);
+        mSearchView.setSearchableInfo(mSearchManager.getSearchableInfo(getActivity().getComponentName()));
+
         //MenuItemCompat.setShowAsAction(mSearchMenu, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
         mDeleteAllMenu = menu.findItem(R.id.menu_delete_all);
@@ -195,9 +206,9 @@ public class ConversationListFragment extends ListFragment {
                 }
                 return true;
 
-            case R.id.menu_search:
+            /*case R.id.menu_search:
                 getActivity().onSearchRequested();
-                return true;
+                return true;*/
 
             case R.id.menu_delete_all:
                 deleteAll();
