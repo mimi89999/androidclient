@@ -19,10 +19,20 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
   <!-- default theme selector -->
-  <style name="Theme.Light" parent="@style/Theme.AppCompat.Light">
-      <item name="actionBarStyle">@style/Widget.Light.ActionBar.Blue.Bold</item>
+  <style name="Theme.Light" parent="Theme.AppCompat.Light.DarkActionBar">
       <item name="actionBarSize">@dimen/actionbar_height</item>
       <item name="actionButtonStyle">@style/Widget.Light.ActionButton.LowDensity</item>
+      <item name="colorPrimary">@color/kontalk_primary</item>
+      <item name="colorPrimaryDark">@color/kontalk_primary_dark</item>
+      <item name="colorAccent">@color/kontalk_accent</item>
+      <item name="android:textColorSecondary">@color/kontalk_text_secondary</item>
+      <item name="android:alertDialogStyle">@style/DialogStyle</item>
+  </style>
+
+  <style name="Theme.Light2" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="actionBarSize">@dimen/actionbar_height</item>
+    <item name="actionButtonStyle">@style/Widget.Light.ActionButton.LowDensity</item>
+    <item name="android:alertDialogStyle">@style/DialogStyle</item>
   </style>
 
   <style name="TextAppearance.Widget.ActionBar.Title.Inverse"

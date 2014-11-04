@@ -25,6 +25,13 @@
 	<drawable name="fill_outgoing_background">#ff3d80dc</drawable>
 	<drawable name="border_outgoing_background">#ff1859bb</drawable>
 
+    <!-- Kontalk color -->
+    <color name="kontalk_primary">#03a8f3</color>
+    <color name="kontalk_primary_dark">#0286c2</color>
+    <color name="kontalk_accent">#ffffff</color>
+    <color name="kontalk_text_secondary">#000000</color>
+    <color name="kontalk_alert_background">#b0bec5</color>
+
     <!-- text color -->
     <color name="text_color_draft">#ffff0000</color>
 
@@ -37,7 +44,20 @@
     <color name="grayed_out">#ff999999</color>
 
     <color name="conversation_active_background">#ff229DC9</color>
+    
+    <!-- audio progress bar color -->
+    <color name="audio_pbar_record">#ffdd1812</color>
+    <color name="audio_pbar_play">#ff00acec</color>
 
     <color name="date_stamp_background">#ff33B5E5</color>
     <color name="date_stamp_text">#dddddd</color>
+
+    <color name="cpb_grey">#ffdedede</color>
+    <color name="cpb_blue">#ff0099cc</color>
+    <color name="cpb_blue_dark">#ff00719b</color>
+    <color name="cpb_red">#ffff4444</color>
+    <color name="cpb_red_dark">#ffcd3a3a</color>
+    <color name="cpb_green">#ff99cc00</color>
+    <color name="cpb_green_dark">#ff6d9b00</color>
+    <color name="cpb_white">#ffffff</color>
 </resources>

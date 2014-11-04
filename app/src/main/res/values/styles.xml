@@ -18,18 +18,19 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
   <!-- default theme selector -->
-  <style name="Theme.Light" parent="@style/Theme.AppCompat.Light">
-      <item name="actionBarStyle">@style/Widget.Light.ActionBar.Blue.Bold</item>
-      <item name="actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>
-      </style>
+  <style name="Theme.Light" parent="Theme.AppCompat.Light.DarkActionBar">
+      <item name="colorPrimary">@color/kontalk_primary</item>
+      <item name="colorPrimaryDark">@color/kontalk_primary_dark</item>
+      <item name="colorAccent">@color/kontalk_accent</item>
+      <item name="android:textColorSecondary">@color/kontalk_text_secondary</item>
+      <item name="android:alertDialogStyle">@style/DialogStyle</item>
+  </style>
 
   <style name="Theme.Light.Subtitle" parent="@style/Theme.Light">
       <item name="actionBarStyle">@style/Widget.Light.ActionBar.Blue</item>
   </style>
 
   <style name="Widget.Light.ActionBar.Blue" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
-    <item name="background">@drawable/titlebar_bg</item>
-    <item name="android:background">@drawable/titlebar_bg</item>
     <item name="titleTextStyle">@style/TextAppearance.Widget.ActionBar.Title.Inverse</item>
     <item name="subtitleTextStyle">@style/TextAppearance.Widget.ActionBar.Subtitle.Inverse</item>
   </style>
@@ -39,20 +40,29 @@
   </style>
 
   <style name="TextAppearance.Widget.ActionBar.Title.Inverse.Bold"
-      parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+      parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
       <item name="android:textStyle">bold</item>
   </style>
 
   <style name="TextAppearance.Widget.ActionBar.Title.Inverse"
       parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+    <item name="android:textColor">@color/cpb_white</item>
   </style>
 
   <style name="TextAppearance.Widget.ActionBar.Subtitle.Inverse"
       parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle.Inverse">
+    <item name="android:textColor">@color/cpb_white</item>
   </style>
 
-  <style name="Widget.ActionButton.Overflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-    <item name="android:src">@drawable/ic_menu_overflow</item>
+  <style name="DialogStyle" parent="@android:style/Theme.Dialog">
+    <item name="android:topBright">@color/kontalk_primary</item>
+    <item name="android:topDark">@color/kontalk_primary</item>
+    <item name="android:centerBright">@color/kontalk_alert_background</item>
+    <item name="android:centerDark">@color/kontalk_alert_background</item>
+    <item name="android:centerMedium">@color/kontalk_alert_background</item>
+    <item name="android:bottomBright">@color/kontalk_primary</item>
+    <item name="android:bottomDark">@color/kontalk_primary</item>
+    <item name="android:bottomMedium">@color/kontalk_primary</item>
   </style>
 
   <!--
@@ -66,7 +76,9 @@
    -->
 
   <!-- default light-to-dark theme selector -->
-  <style name="Theme.Light2" parent="@android:style/Theme"/>
+  <style name="Theme.Light2" parent="Theme.AppCompat.Light.DarkActionBar">
+      <item name="android:alertDialogStyle">@style/DialogStyle</item>
+  </style>
 
   <style name="TextAppearance.Widget.ConversationCountBadge"
       parent="@android:style/TextAppearance.Small.Inverse">

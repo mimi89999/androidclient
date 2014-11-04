@@ -18,25 +18,26 @@
 
 <resources>
   <!-- default light-to-dark theme selector -->
-  <style name="Theme.Light2" parent="@android:style/Theme.Holo.Light"/>
+  <style name="Theme.Light2" parent="Theme.AppCompat.Light.DarkActionBar"/>
 
   <!-- default theme selector -->
-  <style name="Theme.Light" parent="@style/Theme.AppCompat.Light">
-      <item name="android:actionBarStyle">@style/Widget.Light.ActionBar.Blue.Bold</item>
-      <item name="android:actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>
-      </style>
+  <style name="Theme.Light" parent="Theme.AppCompat.Light.DarkActionBar">
+      <item name="colorPrimary">@color/kontalk_primary</item>
+      <item name="colorPrimaryDark">@color/kontalk_primary_dark</item>
+      <item name="colorAccent">@color/kontalk_accent</item>
+      <item name="android:textColorSecondary">@color/kontalk_text_secondary</item>
+  </style>
 
   <style name="Theme.Light.Subtitle" parent="@style/Theme.Light">
       <item name="android:actionBarStyle">@style/Widget.Light.ActionBar.Blue</item>
   </style>
 
   <style name="Widget.Light.ActionBar.Blue" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
-    <item name="android:background">@drawable/titlebar_bg</item>
     <item name="android:titleTextStyle">@style/TextAppearance.Widget.ActionBar.Title.Inverse</item>
     <item name="android:subtitleTextStyle">@style/TextAppearance.Widget.ActionBar.Subtitle.Inverse</item>
   </style>
 
-  <style name="Widget.Light.ActionBar.Blue.Bold" parent="@style/Widget.Light.ActionBar.Blue">
+  <style name="Widget.Light.ActionBar.Blue.Bold" parent="Widget.Light.ActionBar.Blue">
     <item name="android:titleTextStyle">@style/TextAppearance.Widget.ActionBar.Title.Inverse.Bold</item>
   </style>
 
