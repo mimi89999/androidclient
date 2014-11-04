@@ -40,7 +40,11 @@ import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -85,6 +89,7 @@ public class ComposeMessage extends ActionBarActivity {
     private Intent sendIntent;
 
     private ComposeMessageFragment mFragment;
+    private View mLayout;
     private TextView mTitleView;
     private TextView mSubtitleView;
 
@@ -105,9 +110,17 @@ public class ComposeMessage extends ActionBarActivity {
 
         // load the fragment
         mFragment = (ComposeMessageFragment) getSupportFragmentManager()
-            .findFragmentById(R.id.fragment_compose_message);
+                .findFragmentById(R.id.fragment_compose_message);
 
         View customView = getSupportActionBar().getCustomView();
+        mLayout = findViewById(R.id.titlebox);
+        mLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mFragment != null)
+                    mFragment.viewContact();
+            }
+        });
         mTitleView = (TextView) customView.findViewById(R.id.title);
         mSubtitleView = (TextView) customView.findViewById(R.id.summary);
 
@@ -156,14 +169,20 @@ public class ComposeMessage extends ActionBarActivity {
     public void setTitle(CharSequence title, CharSequence subtitle, Contact contact) {
         if (title != null)
             mTitleView.setText(title);
-        if (subtitle != null)
+        if (subtitle != null) {
             mSubtitleView.setText(subtitle);
+            mSubtitleView.setVisibility(View.VISIBLE);
+        }
         if (contact != null) {
             Drawable avatar = contact.getAvatar(this, null);
-            if (avatar == null)
+            if (avatar == null) {
                 avatar = getResources().getDrawable(R.drawable.ic_contact_picture);
-
-            getSupportActionBar().setIcon(avatar);
+                getSupportActionBar().setIcon(avatar);
+            }
+            else {
+                RoundImage roundImage = new RoundImage(avatar);
+                getSupportActionBar().setIcon(roundImage);
+            }
         }
     }
 
@@ -178,7 +197,7 @@ public class ComposeMessage extends ActionBarActivity {
             // we call toString() to strip any existing span
             SpannableString status = new SpannableString(current.toString());
             status.setSpan(sUpdatingTextSpan,
-                0, status.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    0, status.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             view.setText(status);
         }
@@ -193,11 +212,6 @@ public class ComposeMessage extends ActionBarActivity {
     private void onAvatarClick() {
         finish();
         startActivity(new Intent(this, ConversationList.class));
-    }
-
-    public void onTitleboxClick(View view) {
-        if (mFragment != null)
-            mFragment.viewContact();
     }
 
     private void processIntent(Bundle savedInstanceState) {
@@ -315,7 +329,7 @@ public class ComposeMessage extends ActionBarActivity {
                     }
                     else {
                         Toast.makeText(this, R.string.contact_not_registered, Toast.LENGTH_LONG)
-                            .show();
+                                .show();
                         finish();
                     }
                 }
@@ -397,7 +411,7 @@ public class ComposeMessage extends ActionBarActivity {
             // notify to user
             Log.w(TAG, "mime " + mime + " not supported");
             Toast.makeText(this, R.string.send_mime_not_supported, Toast.LENGTH_LONG)
-                .show();
+                    .show();
         }
     }
 

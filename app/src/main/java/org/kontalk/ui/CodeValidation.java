@@ -72,7 +72,7 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
 
         //setSupportProgressBarIndeterminate(true);
         // HACK this is for crappy honeycomb :)
-        setSupportProgressBarIndeterminateVisibility(false);
+        //setSupportProgressBarIndeterminateVisibility(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCode = (EditText) findViewById(R.id.validation_code);
@@ -189,7 +189,7 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
     }
 
     private void startProgress() {
-        setSupportProgressBarIndeterminateVisibility(true);
+        //setSupportProgressBarIndeterminateVisibility(true);
         enableControls(false);
         keepScreenOn(true);
     }

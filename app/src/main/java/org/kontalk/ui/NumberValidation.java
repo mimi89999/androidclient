@@ -77,7 +77,6 @@ import org.kontalk.service.KeyPairGeneratorService.KeyGeneratorReceiver;
 import org.kontalk.service.KeyPairGeneratorService.PersonalKeyRunnable;
 import org.kontalk.sync.SyncAdapter;
 import org.kontalk.ui.CountryCodesAdapter.CountryCode;
-import org.kontalk.util.Preferences;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -300,7 +299,7 @@ public class NumberValidation extends AccountAuthenticatorActionBarActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_settings: {
-                Intent intent = new Intent(this, BootstrapPreferences.class);
+                Intent intent = new Intent(this, PreferencesActivity.class);
                 startActivityIfNeeded(intent, -1);
                 break;
             }
@@ -475,7 +474,7 @@ public class NumberValidation extends AccountAuthenticatorActionBarActivity
 
             // key generation finished, start immediately
             EndpointServer.EndpointServerProvider provider =
-                Preferences.getEndpointServerProvider(this);
+                org.kontalk.util.Preferences.getEndpointServerProvider(this);
             mValidator = new NumberValidator(this, provider, mName, mPhoneNumber, mKey, mPassphrase);
             mValidator.setListener(this);
             mValidator.start();
