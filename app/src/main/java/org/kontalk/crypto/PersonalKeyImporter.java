@@ -18,13 +18,6 @@
 
 package org.kontalk.crypto;
 
-import android.os.Environment;
-
-import org.kontalk.crypto.PGP.PGPKeyPairRing;
-import org.kontalk.util.MessageUtils;
-import org.spongycastle.bcpg.ArmoredInputStream;
-import org.spongycastle.openpgp.PGPException;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,6 +26,14 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.spongycastle.bcpg.ArmoredInputStream;
+import org.spongycastle.openpgp.PGPException;
+
+import android.os.Environment;
+
+import org.kontalk.crypto.PGP.PGPKeyPairRing;
+import org.kontalk.util.MessageUtils;
 
 
 /**

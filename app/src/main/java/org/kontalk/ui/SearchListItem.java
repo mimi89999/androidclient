@@ -18,13 +18,13 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.data.Contact;
-import org.kontalk.data.SearchItem;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.kontalk.data.Contact;
+import org.kontalk.data.SearchItem;
 
 
 public class SearchListItem extends RelativeLayout {

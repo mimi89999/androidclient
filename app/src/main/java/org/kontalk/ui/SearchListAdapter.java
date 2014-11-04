@@ -18,9 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.data.SearchItem;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
@@ -28,6 +25,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+
+import org.kontalk.R;
+import org.kontalk.data.SearchItem;
 
 
 public class SearchListAdapter extends CursorAdapter {

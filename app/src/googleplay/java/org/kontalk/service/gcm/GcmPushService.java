@@ -18,6 +18,15 @@
 
 package org.kontalk.service.gcm;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -25,18 +34,9 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import org.kontalk.Kontalk;
 import org.kontalk.service.msgcenter.IPushListener;
 import org.kontalk.service.msgcenter.IPushService;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 
 /**

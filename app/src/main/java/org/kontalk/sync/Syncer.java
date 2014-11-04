@@ -24,17 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jxmpp.util.XmppStringUtils;
-
-import org.kontalk.R;
-import org.kontalk.client.NumberValidator;
-import org.kontalk.crypto.PGP;
-import org.kontalk.data.Contact;
-import org.kontalk.provider.MyUsers.Users;
-import org.kontalk.service.msgcenter.MessageCenterService;
-import org.kontalk.util.MessageUtils;
 
 import android.accounts.Account;
 import android.accounts.OperationCanceledException;
@@ -56,6 +47,13 @@ import android.provider.ContactsContract.RawContacts;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.kontalk.R;
+import org.kontalk.client.NumberValidator;
+import org.kontalk.crypto.PGP;
+import org.kontalk.data.Contact;
+import org.kontalk.provider.MyUsers.Users;
+import org.kontalk.service.msgcenter.MessageCenterService;
 
 
 /**

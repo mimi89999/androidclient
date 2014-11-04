@@ -18,6 +18,8 @@
 
 package org.kontalk.ui;
 
+import java.net.SocketException;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,8 +40,6 @@ import org.kontalk.client.NumberValidator.NumberValidatorListener;
 import org.kontalk.crypto.PersonalKey;
 import org.kontalk.service.KeyPairGeneratorService;
 import org.kontalk.util.Preferences;
-
-import java.net.SocketException;
 
 
 /** Manual validation code input. */

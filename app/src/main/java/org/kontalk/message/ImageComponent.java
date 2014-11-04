@@ -23,15 +23,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.kontalk.Kontalk;
-import org.kontalk.util.MediaStorage;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
+
+import org.kontalk.Kontalk;
+import org.kontalk.util.MediaStorage;
 
 
 /**

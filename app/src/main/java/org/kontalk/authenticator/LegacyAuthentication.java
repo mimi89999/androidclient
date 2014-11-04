@@ -18,11 +18,11 @@
 
 package org.kontalk.authenticator;
 
-import org.kontalk.service.msgcenter.MessageCenterService;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
+
+import org.kontalk.service.msgcenter.MessageCenterService;
 
 
 /**

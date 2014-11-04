@@ -24,16 +24,16 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kontalk.crypto.Coder;
-import org.kontalk.provider.MyMessages.Messages;
-import org.kontalk.provider.MyMessages.Threads.Conversations;
-
 import android.content.AsyncQueryHandler;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcelable;
+
+import org.kontalk.crypto.Coder;
+import org.kontalk.provider.MyMessages.Messages;
+import org.kontalk.provider.MyMessages.Threads.Conversations;
 
 
 /**

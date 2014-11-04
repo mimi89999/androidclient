@@ -18,15 +18,14 @@
 
 package org.kontalk.data;
 
-import org.jivesoftware.smack.util.StringUtils;
-import org.kontalk.provider.MessagesProvider;
-import org.kontalk.provider.MyMessages.Threads;
-import org.kontalk.ui.MessagingNotification;
-
 import android.content.AsyncQueryHandler;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+
+import org.kontalk.provider.MessagesProvider;
+import org.kontalk.provider.MyMessages.Threads;
+import org.kontalk.ui.MessagingNotification;
 
 
 /**

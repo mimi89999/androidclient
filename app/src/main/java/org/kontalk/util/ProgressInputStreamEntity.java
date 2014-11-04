@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.http.entity.InputStreamEntity;
+
 import org.kontalk.service.ProgressListener;
 import org.kontalk.upload.UploadConnection;
 

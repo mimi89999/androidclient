@@ -18,16 +18,16 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-import org.kontalk.data.Contact.ContactCallback;
-
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.widget.QuickContactBadge;
 import android.widget.RelativeLayout;
+
+import org.kontalk.R;
+import org.kontalk.data.Contact;
+import org.kontalk.data.Contact.ContactCallback;
 
 public abstract class AvatarListItem extends RelativeLayout implements ContactCallback {
 

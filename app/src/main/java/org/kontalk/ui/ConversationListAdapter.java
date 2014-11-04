@@ -18,9 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.data.Conversation;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
@@ -30,6 +27,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.RecyclerListener;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+
+import org.kontalk.R;
+import org.kontalk.data.Conversation;
 
 
 public class ConversationListAdapter extends CursorAdapter {

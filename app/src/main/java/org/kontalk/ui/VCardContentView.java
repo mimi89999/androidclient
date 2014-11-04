@@ -29,7 +29,6 @@ import android.widget.TextView;
 import org.kontalk.R;
 import org.kontalk.data.Contact;
 import org.kontalk.message.CompositeMessage;
-import org.kontalk.message.TextComponent;
 import org.kontalk.message.VCardComponent;
 
 

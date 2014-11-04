@@ -22,12 +22,20 @@ package org.kontalk.service;
  * TODO instead of using a notification ID per type, use a notification ID per
  * upload.
  */
-import static org.kontalk.ui.MessagingNotification.NOTIFICATION_ID_UPLOADING;
-import static org.kontalk.ui.MessagingNotification.NOTIFICATION_ID_UPLOAD_ERROR;
 
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import org.kontalk.Kontalk;
 import org.kontalk.R;
@@ -40,15 +48,8 @@ import org.kontalk.upload.KontalkBoxUploadConnection;
 import org.kontalk.upload.UploadConnection;
 import org.kontalk.util.MediaStorage;
 
-import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+import static org.kontalk.ui.MessagingNotification.NOTIFICATION_ID_UPLOADING;
+import static org.kontalk.ui.MessagingNotification.NOTIFICATION_ID_UPLOAD_ERROR;
 
 
 /**

@@ -18,10 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.service.msgcenter.MessageCenterService;
-import org.kontalk.util.Preferences;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -33,6 +29,10 @@ import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import org.kontalk.R;
+import org.kontalk.service.msgcenter.MessageCenterService;
+import org.kontalk.util.Preferences;
 
 
 /**

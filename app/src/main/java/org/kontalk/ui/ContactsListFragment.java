@@ -18,11 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-import org.kontalk.sync.SyncAdapter;
-import org.kontalk.util.RunnableBroadcastReceiver;
-
 import android.app.Activity;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -36,6 +31,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.kontalk.R;
+import org.kontalk.data.Contact;
+import org.kontalk.sync.SyncAdapter;
+import org.kontalk.util.RunnableBroadcastReceiver;
 
 
 /** Contacts list selection fragment. */

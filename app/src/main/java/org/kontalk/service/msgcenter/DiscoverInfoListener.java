@@ -26,6 +26,7 @@ import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+
 import org.kontalk.client.EndpointServer;
 import org.kontalk.client.PushRegistration;
 import org.kontalk.client.UploadExtension;

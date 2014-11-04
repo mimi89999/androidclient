@@ -20,18 +20,6 @@ package org.kontalk.ui;
 
 import java.util.Arrays;
 
-import org.kontalk.BuildConfig;
-import org.kontalk.R;
-import org.kontalk.billing.BillingResult;
-import org.kontalk.billing.BillingServiceManager;
-import org.kontalk.billing.IBillingService;
-import org.kontalk.billing.IInventory;
-import org.kontalk.billing.IProductDetails;
-import org.kontalk.billing.IPurchase;
-import org.kontalk.billing.OnBillingSetupFinishedListener;
-import org.kontalk.billing.OnPurchaseFinishedListener;
-import org.kontalk.billing.QueryInventoryFinishedListener;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -48,6 +36,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import org.kontalk.BuildConfig;
+import org.kontalk.R;
+import org.kontalk.billing.BillingResult;
+import org.kontalk.billing.BillingServiceManager;
+import org.kontalk.billing.IBillingService;
+import org.kontalk.billing.IInventory;
+import org.kontalk.billing.IProductDetails;
+import org.kontalk.billing.IPurchase;
+import org.kontalk.billing.OnBillingSetupFinishedListener;
+import org.kontalk.billing.OnPurchaseFinishedListener;
+import org.kontalk.billing.QueryInventoryFinishedListener;
 
 
 /**

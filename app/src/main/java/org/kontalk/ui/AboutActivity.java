@@ -18,9 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.billing.IBillingService;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,6 +29,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
+
+import org.kontalk.R;
+import org.kontalk.billing.IBillingService;
 
 
 /**

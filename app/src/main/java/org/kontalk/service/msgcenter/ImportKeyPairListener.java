@@ -18,18 +18,19 @@
 
 package org.kontalk.service.msgcenter;
 
-import android.widget.Toast;
-
-import org.jivesoftware.smack.packet.Packet;
-import org.kontalk.R;
-import org.kontalk.crypto.PersonalKeyImporter;
-import org.spongycastle.openpgp.PGPException;
-
 import java.io.IOException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.util.zip.ZipInputStream;
+
+import org.jivesoftware.smack.packet.Packet;
+import org.spongycastle.openpgp.PGPException;
+
+import android.widget.Toast;
+
+import org.kontalk.R;
+import org.kontalk.crypto.PersonalKeyImporter;
 
 
 /** Listener and manager for a key pair import cycle. */

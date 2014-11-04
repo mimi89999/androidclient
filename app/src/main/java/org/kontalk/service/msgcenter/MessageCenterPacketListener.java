@@ -24,17 +24,18 @@ import java.util.Map;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
-import org.kontalk.Kontalk;
-import org.kontalk.client.EndpointServer;
-import org.kontalk.client.KontalkConnection;
-import org.kontalk.message.CompositeMessage;
-import org.kontalk.service.msgcenter.MessageCenterService.IdleConnectionHandler;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+
+import org.kontalk.Kontalk;
+import org.kontalk.client.EndpointServer;
+import org.kontalk.client.KontalkConnection;
+import org.kontalk.message.CompositeMessage;
+import org.kontalk.service.msgcenter.MessageCenterService.IdleConnectionHandler;
 
 
 /**

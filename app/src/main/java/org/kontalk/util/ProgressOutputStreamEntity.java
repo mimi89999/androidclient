@@ -26,6 +26,7 @@ import java.io.OutputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+
 import org.kontalk.service.DownloadListener;
 
 

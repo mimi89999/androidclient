@@ -15,10 +15,10 @@
 
 package org.kontalk.billing;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
-
-import java.util.List;
 
 
 /**

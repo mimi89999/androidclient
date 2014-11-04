@@ -18,8 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -28,6 +26,8 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+
+import org.kontalk.R;
 
 
 /**

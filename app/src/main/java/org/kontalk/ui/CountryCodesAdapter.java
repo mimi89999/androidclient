@@ -24,8 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import org.kontalk.R;
-import org.kontalk.client.NumberValidator;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import android.content.Context;
 import android.util.Log;
@@ -38,7 +37,8 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import org.kontalk.R;
+import org.kontalk.client.NumberValidator;
 
 
 public class CountryCodesAdapter extends BaseAdapter {

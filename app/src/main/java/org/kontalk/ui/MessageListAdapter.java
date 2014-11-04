@@ -18,13 +18,7 @@
 
 package org.kontalk.ui;
 
-import java.util.Date;
 import java.util.regex.Pattern;
-
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-import org.kontalk.message.CompositeMessage;
-import org.kontalk.provider.MyMessages.Messages;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -35,6 +29,11 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.RecyclerListener;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+
+import org.kontalk.R;
+import org.kontalk.data.Contact;
+import org.kontalk.message.CompositeMessage;
+import org.kontalk.provider.MyMessages.Messages;
 
 public class MessageListAdapter extends CursorAdapter {
 

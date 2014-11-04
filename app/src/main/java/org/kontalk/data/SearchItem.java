@@ -18,11 +18,11 @@
 
 package org.kontalk.data;
 
-import org.kontalk.provider.MyMessages.Messages;
-import org.kontalk.provider.MyMessages.Messages.Fulltext;
-
 import android.content.Context;
 import android.database.Cursor;
+
+import org.kontalk.provider.MyMessages.Messages;
+import org.kontalk.provider.MyMessages.Messages.Fulltext;
 
 
 /**

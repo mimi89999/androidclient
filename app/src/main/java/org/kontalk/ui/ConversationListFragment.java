@@ -18,13 +18,6 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-import org.kontalk.data.Conversation;
-import org.kontalk.provider.MessagesProvider;
-import org.kontalk.service.msgcenter.MessageCenterService;
-import org.kontalk.util.Preferences;
-
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
@@ -35,7 +28,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
@@ -51,10 +43,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.kontalk.R;
+import org.kontalk.data.Contact;
+import org.kontalk.data.Conversation;
+import org.kontalk.provider.MessagesProvider;
+import org.kontalk.util.Preferences;
 
 
 public class ConversationListFragment extends ListFragment {

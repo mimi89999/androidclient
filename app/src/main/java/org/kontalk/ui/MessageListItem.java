@@ -18,6 +18,9 @@
 
 package org.kontalk.ui;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -38,9 +41,6 @@ import org.kontalk.message.TextComponent;
 import org.kontalk.provider.MyMessages.Messages;
 import org.kontalk.util.MessageUtils;
 import org.kontalk.util.Preferences;
-
-import java.util.List;
-import java.util.regex.Pattern;
 
 
 /**

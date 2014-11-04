@@ -53,6 +53,7 @@ import org.kontalk.util.Preferences;
 
 import static org.kontalk.service.msgcenter.MessageCenterService.ACTION_PRESENCE;
 import static org.kontalk.service.msgcenter.MessageCenterService.ACTION_SUBSCRIBED;
+import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_FINGERPRINT;
 import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_FROM;
 import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_GROUP_COUNT;
 import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_GROUP_ID;
@@ -63,7 +64,6 @@ import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_STAMP;
 import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_STATUS;
 import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_TO;
 import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_TYPE;
-import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_FINGERPRINT;
 
 
 /**

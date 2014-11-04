@@ -18,12 +18,12 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import org.kontalk.R;
+import org.kontalk.data.Contact;
 
 
 public class ContactsListItem extends AvatarListItem {

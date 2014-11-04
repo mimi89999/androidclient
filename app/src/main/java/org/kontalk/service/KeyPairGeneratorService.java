@@ -18,14 +18,8 @@
 
 package org.kontalk.service;
 
-import static org.kontalk.ui.MessagingNotification.NOTIFICATION_ID_KEYPAIR_GEN;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-
-import org.kontalk.R;
-import org.kontalk.crypto.PersonalKey;
-import org.kontalk.ui.ConversationList;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -39,6 +33,12 @@ import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import org.kontalk.R;
+import org.kontalk.crypto.PersonalKey;
+import org.kontalk.ui.ConversationList;
+
+import static org.kontalk.ui.MessagingNotification.NOTIFICATION_ID_KEYPAIR_GEN;
 
 
 /** Generates a key pair in the background. */

@@ -18,17 +18,16 @@
 
 package org.kontalk.ui;
 
+import java.util.regex.Pattern;
+
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import org.kontalk.data.Contact;
 import org.kontalk.message.ImageComponent;
 import org.kontalk.message.MessageComponent;
-import org.kontalk.message.RawComponent;
 import org.kontalk.message.TextComponent;
 import org.kontalk.message.VCardComponent;
-
-import java.util.regex.Pattern;
 
 
 /**

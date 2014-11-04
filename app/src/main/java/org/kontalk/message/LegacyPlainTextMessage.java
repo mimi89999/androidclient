@@ -22,12 +22,12 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import org.kontalk.R;
-import org.kontalk.crypto.Coder;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Message;
+
+import org.kontalk.R;
+import org.kontalk.crypto.Coder;
 
 
 /**

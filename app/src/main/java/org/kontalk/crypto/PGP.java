@@ -33,7 +33,6 @@ import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.kontalk.util.MessageUtils;
 import org.spongycastle.bcpg.ArmoredInputStream;
 import org.spongycastle.bcpg.HashAlgorithmTags;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
@@ -66,6 +65,8 @@ import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
 import android.os.Parcel;
 import android.util.Log;
+
+import org.kontalk.util.MessageUtils;
 
 
 /** Some PGP utility method, mainly for use by {@link PersonalKey}. */

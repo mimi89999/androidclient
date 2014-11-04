@@ -22,15 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.kontalk.client.EndpointServer;
-import org.kontalk.crypto.Coder;
-import org.kontalk.provider.MyMessages.CommonColumns;
-import org.kontalk.provider.MyMessages.Messages;
-import org.kontalk.provider.MyMessages.Threads;
-import org.kontalk.provider.MyMessages.Messages.Fulltext;
-import org.kontalk.provider.MyMessages.Threads.Conversations;
-import org.kontalk.util.Preferences;
-
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -46,6 +37,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
+
+import org.kontalk.client.EndpointServer;
+import org.kontalk.crypto.Coder;
+import org.kontalk.provider.MyMessages.CommonColumns;
+import org.kontalk.provider.MyMessages.Messages;
+import org.kontalk.provider.MyMessages.Messages.Fulltext;
+import org.kontalk.provider.MyMessages.Threads;
+import org.kontalk.provider.MyMessages.Threads.Conversations;
+import org.kontalk.util.Preferences;
 
 
 /**

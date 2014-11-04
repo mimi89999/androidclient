@@ -18,10 +18,6 @@
 
 package org.kontalk.service.msgcenter;
 
-import static org.kontalk.service.msgcenter.MessageCenterService.ACTION_MESSAGE;
-import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_FROM;
-import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_TO;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -33,6 +29,14 @@ import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
 import org.jivesoftware.smackx.delay.packet.DelayInformation;
+
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+
 import org.kontalk.client.AckServerReceipt;
 import org.kontalk.client.BitsOfBinary;
 import org.kontalk.client.E2EEncryption;
@@ -52,12 +56,9 @@ import org.kontalk.provider.MyMessages.Messages;
 import org.kontalk.util.MediaStorage;
 import org.kontalk.util.MessageUtils;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
+import static org.kontalk.service.msgcenter.MessageCenterService.ACTION_MESSAGE;
+import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_FROM;
+import static org.kontalk.service.msgcenter.MessageCenterService.EXTRA_TO;
 
 
 /**

@@ -30,11 +30,11 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Enumeration;
 
-import org.kontalk.R;
-import org.kontalk.crypto.PGP;
-
 import android.content.Context;
 import android.os.Build;
+
+import org.kontalk.R;
+import org.kontalk.crypto.PGP;
 
 
 /** Some trust store utilities. */

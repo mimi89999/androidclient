@@ -17,7 +17,6 @@ package org.kontalk.billing;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.kontalk.billing.IProductDetails;
 
 /**
  * Represents an in-app product's listing details.

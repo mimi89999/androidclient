@@ -18,16 +18,13 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.service.msgcenter.PushServiceManager;
+import com.github.machinarius.preferencefragment.PreferenceFragment;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.view.MenuItem;
-import com.github.machinarius.preferencefragment.PreferenceFragment;
+
+import org.kontalk.R;
+import org.kontalk.service.msgcenter.PushServiceManager;
 
 
 /**

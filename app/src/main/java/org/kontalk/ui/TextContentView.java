@@ -18,6 +18,11 @@
 
 package org.kontalk.ui;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.rockerhieu.emojicon.EmojiconTextView;
+
 import android.content.Context;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
@@ -27,19 +32,11 @@ import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.kontalk.R;
 import org.kontalk.data.Contact;
-import org.kontalk.message.RawComponent;
 import org.kontalk.message.TextComponent;
-import org.kontalk.util.MessageUtils;
 import org.kontalk.util.Preferences;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.rockerhieu.emojicon.EmojiconTextView;
 
 
 /**

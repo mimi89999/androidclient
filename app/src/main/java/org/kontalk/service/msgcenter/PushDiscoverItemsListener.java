@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+
 import org.kontalk.util.Preferences;
 
 

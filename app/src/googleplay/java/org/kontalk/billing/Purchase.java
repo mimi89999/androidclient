@@ -17,7 +17,6 @@ package org.kontalk.billing;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.kontalk.billing.IPurchase;
 
 /**
  * Represents an in-app billing purchase.

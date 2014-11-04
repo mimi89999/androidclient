@@ -18,6 +18,14 @@
 
 package org.kontalk.service.msgcenter;
 
+import java.io.IOException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+
+import org.jivesoftware.smack.packet.Packet;
+import org.spongycastle.openpgp.PGPException;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.BroadcastReceiver;
@@ -27,7 +35,6 @@ import android.content.IntentFilter;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.jivesoftware.smack.packet.Packet;
 import org.kontalk.R;
 import org.kontalk.authenticator.Authenticator;
 import org.kontalk.crypto.PersonalKey;
@@ -35,12 +42,6 @@ import org.kontalk.service.KeyPairGeneratorService;
 import org.kontalk.service.KeyPairGeneratorService.KeyGeneratorReceiver;
 import org.kontalk.service.KeyPairGeneratorService.PersonalKeyRunnable;
 import org.kontalk.util.MessageUtils;
-import org.spongycastle.openpgp.PGPException;
-
-import java.io.IOException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
 
 import static org.kontalk.service.msgcenter.MessageCenterService.ACTION_REGENERATE_KEYPAIR;
 

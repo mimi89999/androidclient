@@ -18,19 +18,18 @@
 
 package org.kontalk.crypto;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Base64;
-import android.util.Log;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Iterator;
 
-import org.kontalk.Kontalk;
-import org.kontalk.authenticator.Authenticator;
-import org.kontalk.crypto.PGP.PGPDecryptedKeyPairRing;
-import org.kontalk.crypto.PGP.PGPKeyPairRing;
-import org.kontalk.util.MessageUtils;
 import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPKeyPair;
 import org.spongycastle.openpgp.PGPObjectFactory;
@@ -47,17 +46,19 @@ import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.spongycastle.operator.OperatorCreationException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Iterator;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Base64;
+import android.util.Log;
+
+import org.kontalk.Kontalk;
+import org.kontalk.authenticator.Authenticator;
+import org.kontalk.crypto.PGP.PGPDecryptedKeyPairRing;
+import org.kontalk.crypto.PGP.PGPKeyPairRing;
+import org.kontalk.util.MessageUtils;
 
 
 /** Personal asymmetric encryption key. */

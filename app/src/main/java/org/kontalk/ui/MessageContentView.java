@@ -18,9 +18,9 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.data.Contact;
-
 import java.util.regex.Pattern;
+
+import org.kontalk.data.Contact;
 
 
 /**

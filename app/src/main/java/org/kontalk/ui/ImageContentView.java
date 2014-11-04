@@ -18,6 +18,8 @@
 
 package org.kontalk.ui;
 
+import java.util.regex.Pattern;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
@@ -28,8 +30,6 @@ import android.widget.ImageView;
 import org.kontalk.R;
 import org.kontalk.data.Contact;
 import org.kontalk.message.ImageComponent;
-
-import java.util.regex.Pattern;
 
 
 /**

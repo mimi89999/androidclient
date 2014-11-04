@@ -21,11 +21,6 @@ package org.kontalk.ui;
 import java.io.IOException;
 import java.util.Random;
 
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-import org.kontalk.provider.MyMessages.Messages;
-import org.kontalk.util.Preferences;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
@@ -42,6 +37,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.kontalk.R;
+import org.kontalk.data.Contact;
+import org.kontalk.provider.MyMessages.Messages;
+import org.kontalk.util.Preferences;
 
 
 public class QuickReplyActivity extends Activity {

@@ -19,9 +19,10 @@
 package org.kontalk.service.msgcenter;
 
 import org.jivesoftware.smack.packet.Packet;
-import org.kontalk.client.UploadInfo;
 
 import android.util.Log;
+
+import org.kontalk.client.UploadInfo;
 
 
 /**

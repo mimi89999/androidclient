@@ -60,13 +60,14 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+
+import android.content.Context;
+import android.util.Log;
+
 import org.kontalk.service.DownloadListener;
 import org.kontalk.util.InternalTrustStore;
 import org.kontalk.util.Preferences;
 import org.kontalk.util.ProgressOutputStreamEntity;
-
-import android.content.Context;
-import android.util.Log;
 
 
 /**

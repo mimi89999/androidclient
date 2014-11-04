@@ -20,10 +20,7 @@ package org.kontalk.service.gcm;
 
 import java.util.Random;
 
-import org.kontalk.Kontalk;
-import org.kontalk.service.msgcenter.MessageCenterService;
-import org.kontalk.service.msgcenter.PushServiceManager;
-import org.kontalk.util.Preferences;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -32,7 +29,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import org.kontalk.Kontalk;
+import org.kontalk.service.msgcenter.MessageCenterService;
+import org.kontalk.service.msgcenter.PushServiceManager;
+import org.kontalk.util.Preferences;
 
 
 /**
