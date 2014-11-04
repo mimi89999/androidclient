@@ -39,6 +39,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <!-- do not make telephony and touchscreen mandatory -->
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
@@ -124,8 +125,8 @@
         </activity>
 
         <activity android:name=".ui.ComposeMessage"
-            android:theme="@style/Theme.Light.Subtitle"
-            android:configChanges="keyboardHidden"
+            android:theme="@style/Theme.Light"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -172,7 +173,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.BootstrapPreferences" android:theme="@style/Theme.Light2"/>
 
         <activity android:name=".ui.NumberValidation"
             android:theme="@style/Theme.Light"/>

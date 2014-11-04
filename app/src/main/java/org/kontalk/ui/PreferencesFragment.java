@@ -19,6 +19,7 @@
 package org.kontalk.ui;
 
 import java.io.File;
+import java.util.List;
 
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
@@ -40,7 +41,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
+import com.github.machinarius.preferencefragment.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.util.Log;
@@ -63,29 +64,20 @@ import static org.kontalk.crypto.PersonalKeyImporter.KEYPACK_FILENAME;
 
 
 /**
- * Preferences activity.
- * TODO convert to fragments layout
+ * PreferencesFragment.
  * @author Daniele Ricci
+ * @author Andrea Cappelli
  */
-public final class PreferencesActivity extends PreferenceActivity {
+public final class PreferencesFragment extends PreferenceFragment {
     private static final String TAG = Kontalk.TAG;
 
     private static final int REQUEST_PICK_BACKGROUND = Activity.RESULT_FIRST_USER + 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // no account - redirect to bootstrap preferences
-        if (Authenticator.getDefaultAccount(this) == null) {
-            startActivity(new Intent(this, BootstrapPreferences.class));
-            finish();
-            return;
-        }
-
         addPreferencesFromResource(R.xml.preferences);
-
-        setupActivity();
 
         // push notifications checkbox
         final Preference pushNotifications = findPreference("pref_push_notifications");
@@ -94,9 +86,9 @@ public final class PreferencesActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 CheckBoxPreference pref = (CheckBoxPreference) preference;
                 if (pref.isChecked())
-                    MessageCenterService.enablePushNotifications(getApplicationContext());
+                    MessageCenterService.enablePushNotifications(getActivity().getApplicationContext());
                 else
-                    MessageCenterService.disablePushNotifications(getApplicationContext());
+                    MessageCenterService.disablePushNotifications(getActivity().getApplicationContext());
 
                 return true;
             }
@@ -108,8 +100,8 @@ public final class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Log.w(TAG, "manual message center restart requested");
-                MessageCenterService.restart(getApplicationContext());
-                Toast.makeText(PreferencesActivity.this, R.string.msg_msgcenter_restarted, Toast.LENGTH_SHORT).show();
+                MessageCenterService.restart(getActivity());
+                Toast.makeText(getActivity(), R.string.msg_msgcenter_restarted, Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -120,7 +112,7 @@ public final class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                if (Authenticator.isUserPassphrase(PreferencesActivity.this)) {
+                if (Authenticator.isUserPassphrase(getActivity())) {
 
                     OnPassphraseRequestListener action = new OnPassphraseRequestListener() {
                         public void onValidPassphrase(String passphrase) {
@@ -128,7 +120,7 @@ public final class PreferencesActivity extends PreferenceActivity {
                         }
 
                         public void onInvalidPassphrase() {
-                            new AlertDialog.Builder(PreferencesActivity.this)
+                            new AlertDialog.Builder(getActivity())
                                 .setTitle(R.string.title_passphrase)
                                 .setMessage(R.string.err_password_invalid)
                                 .show();
@@ -151,16 +143,16 @@ public final class PreferencesActivity extends PreferenceActivity {
         regenKeyPair.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new AlertDialog.Builder(PreferencesActivity.this)
+                new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.pref_regenerate_keypair)
                         .setMessage(R.string.pref_regenerate_keypair_confirm)
                         .setNegativeButton(android.R.string.cancel, null)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(PreferencesActivity.this, R.string.msg_generating_keypair,
+                                Toast.makeText(getActivity(), R.string.msg_generating_keypair,
                                         Toast.LENGTH_LONG).show();
 
-                                MessageCenterService.regenerateKeyPair(getApplicationContext());
+                                MessageCenterService.regenerateKeyPair(getActivity());
                             }
                         })
                         .show();
@@ -181,9 +173,9 @@ public final class PreferencesActivity extends PreferenceActivity {
                     public void onPassphraseChanged(String passphrase) {
                         try {
 
-                            ((Kontalk)getApplicationContext()).exportPersonalKey(passphrase);
+                            ((Kontalk)getActivity().getApplicationContext()).exportPersonalKey(passphrase);
 
-                            Toast.makeText(PreferencesActivity.this,
+                            Toast.makeText(getActivity(),
                                 R.string.msg_keypair_exported,
                                 Toast.LENGTH_LONG).show();
 
@@ -191,7 +183,7 @@ public final class PreferencesActivity extends PreferenceActivity {
                         catch (Exception e) {
 
                             Log.e(TAG, "error exporting keys", e);
-                            Toast.makeText(PreferencesActivity.this,
+                            Toast.makeText(getActivity(),
                                 // TODO i18n
                                 "Unable to export personal key.",
                                 Toast.LENGTH_LONG).show();
@@ -202,7 +194,7 @@ public final class PreferencesActivity extends PreferenceActivity {
 
                 // passphrase was never set by the user
                 // encrypt it with a user-defined passphrase first
-                if (!Authenticator.isUserPassphrase(PreferencesActivity.this)) {
+                if (!Authenticator.isUserPassphrase(getActivity())) {
                     askNewPassphrase(action);
                 }
 
@@ -213,7 +205,7 @@ public final class PreferencesActivity extends PreferenceActivity {
                         }
 
                         public void onInvalidPassphrase() {
-                            new AlertDialog.Builder(PreferencesActivity.this)
+                            new AlertDialog.Builder(getActivity())
                                 .setTitle(R.string.pref_export_keypair)
                                 .setMessage(R.string.err_password_invalid)
                                 .setPositiveButton(android.R.string.ok, null)
@@ -233,7 +225,7 @@ public final class PreferencesActivity extends PreferenceActivity {
         importKeyPair.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new AlertDialog.Builder(PreferencesActivity.this)
+                new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.pref_import_keypair)
                     .setMessage(getString(R.string.msg_import_keypair, KEYPACK_FILENAME))
                     .setNegativeButton(android.R.string.cancel, null)
@@ -241,8 +233,8 @@ public final class PreferencesActivity extends PreferenceActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             Uri keypack = Uri.fromFile(new File(Environment
                                 .getExternalStorageDirectory(), KEYPACK_FILENAME));
-                            MessageCenterService.importKeyPair(getApplicationContext(),
-                                keypack, ((Kontalk) getApplication()).getCachedPassphrase());
+                            MessageCenterService.importKeyPair(getActivity(),
+                                keypack, ((Kontalk) getActivity().getApplicationContext()).getCachedPassphrase());
                         }
                     })
                     .show();
@@ -256,30 +248,30 @@ public final class PreferencesActivity extends PreferenceActivity {
         deleteAccount.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new AlertDialog.Builder(PreferencesActivity.this)
+                new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.pref_delete_account)
                     .setMessage(R.string.msg_delete_account)
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // progress dialog
-                            final LockedProgressDialog progress = new LockedProgressDialog(PreferencesActivity.this);
+                            final LockedProgressDialog progress = new LockedProgressDialog(getActivity());
                             progress.setMessage(getString(R.string.msg_delete_account_progress));
                             progress.setIndeterminate(true);
                             progress.show();
 
                             // stop the message center first
-                            MessageCenterService.stop(getApplicationContext());
+                            MessageCenterService.stop(getActivity());
 
                             AccountManagerCallback<Boolean> callback = new AccountManagerCallback<Boolean>() {
                                 public void run(AccountManagerFuture<Boolean> future) {
                                     // dismiss progress
                                     progress.dismiss();
                                     // exit now
-                                    finish();
+                                    getActivity().finish();
                                 }
                             };
-                            Authenticator.removeDefaultAccount(PreferencesActivity.this, callback);
+                            Authenticator.removeDefaultAccount(getActivity(), callback);
                         }
                     })
                     .show();
@@ -323,7 +315,7 @@ public final class PreferencesActivity extends PreferenceActivity {
         });
 
         // disable push notifications if GCM is not available on the device
-        if (!PushServiceManager.getInstance(this).isServiceAvailable()) {
+        if (!PushServiceManager.getInstance(getActivity()).isServiceAvailable()) {
             final Preference push = findPreference("pref_push_notifications");
             push.setEnabled(false);
         }
@@ -337,9 +329,9 @@ public final class PreferencesActivity extends PreferenceActivity {
         updateServerList.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final ServerListUpdater updater = new ServerListUpdater(PreferencesActivity.this);
+                final ServerListUpdater updater = new ServerListUpdater(getActivity());
 
-                final ProgressDialog diag = new ProgressDialog(PreferencesActivity.this);
+                final ProgressDialog diag = new ProgressDialog(getActivity());
                 diag.setCancelable(true);
                 diag.setMessage(getString(R.string.serverlist_updating));
                 diag.setIndeterminate(true);
@@ -378,21 +370,21 @@ public final class PreferencesActivity extends PreferenceActivity {
                     @Override
                     public void updated(final ServerList list) {
                         diag.dismiss();
-                        runOnUiThread(new Runnable() {
+                        getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 Preferences.updateServerListLastUpdate(updateServerList, list);
                                 // restart message center
-                                MessageCenterService.restart(getApplicationContext());
+                                MessageCenterService.restart(getActivity());
                             }
                         });
                     }
 
                     private void message(final int textId) {
-                        runOnUiThread(new Runnable() {
+                        getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(PreferencesActivity.this, textId,
+                                Toast.makeText(getActivity(), textId,
                                     Toast.LENGTH_LONG).show();
                             }
                         });
@@ -406,7 +398,7 @@ public final class PreferencesActivity extends PreferenceActivity {
         });
 
         // update 'last update' string
-        ServerList list = ServerListUpdater.getCurrentList(this);
+        ServerList list = ServerListUpdater.getCurrentList(getActivity());
         if (list != null)
             Preferences.updateServerListLastUpdate(updateServerList, list);
     }
@@ -421,7 +413,7 @@ public final class PreferencesActivity extends PreferenceActivity {
     }
 
     private void askCurrentPassphrase(final OnPassphraseRequestListener action) {
-        new InputDialog.Builder(PreferencesActivity.this,
+        new InputDialog.Builder(getActivity(),
             InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)
             .setTitle(R.string.title_passphrase)
             .setNegativeButton(android.R.string.cancel, null)
@@ -431,7 +423,7 @@ public final class PreferencesActivity extends PreferenceActivity {
                     String passphrase = InputDialog.getInputText((Dialog) dialog).toString();
                     // user-entered passphrase is hashed, so compare with SHA-1 version
                     String hashed = MessageUtils.sha1(passphrase);
-                    if (hashed.equals(((Kontalk) getApplicationContext())
+                    if (hashed.equals(((Kontalk) getActivity().getApplicationContext())
                         .getCachedPassphrase())) {
                         action.onValidPassphrase(passphrase);
                     }
@@ -449,23 +441,23 @@ public final class PreferencesActivity extends PreferenceActivity {
     }
 
     private void askNewPassphrase(final OnPassphraseChangedListener action) {
-        new PasswordInputDialog.Builder(this)
+        new PasswordInputDialog.Builder(getActivity())
             .setMinLength(PersonalKey.MIN_PASSPHRASE_LENGTH)
             .setTitle(R.string.pref_change_passphrase)
             .setPositiveButton(android.R.string.ok, new PasswordInputDialog.OnPasswordInputListener() {
                 public void onClick(DialogInterface dialog, int which, String password) {
-                    String oldPassword = ((Kontalk) getApplicationContext()).getCachedPassphrase();
+                    String oldPassword = ((Kontalk) getActivity().getApplicationContext()).getCachedPassphrase();
                     try {
                         // user-entered passphrase must be hashed
                         String hashed = MessageUtils.sha1(password);
-                        Authenticator.changePassphrase(PreferencesActivity.this, oldPassword, hashed, true);
-                        ((Kontalk) getApplicationContext()).invalidatePersonalKey();
+                        Authenticator.changePassphrase(getActivity(), oldPassword, hashed, true);
+                        ((Kontalk) getActivity().getApplicationContext()).invalidatePersonalKey();
 
                         if (action != null)
                             action.onPassphraseChanged(password);
                     }
                     catch (Exception e) {
-                        Toast.makeText(PreferencesActivity.this,
+                        Toast.makeText(getActivity(),
                             R.string.err_change_passphrase, Toast.LENGTH_LONG)
                             .show();
                     }
@@ -475,38 +467,17 @@ public final class PreferencesActivity extends PreferenceActivity {
             .show();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void setupActivity() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ActionBar bar = getActionBar();
-            bar.setDisplayShowHomeEnabled(true);
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                startActivity(new Intent(this, ConversationList.class));
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_PICK_BACKGROUND) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == getActivity().RESULT_OK) {
                 // invalidate any previous reference
                 Preferences.setCachedCustomBackground(null);
                 // resize and cache image
                 // TODO do this in background (might take some time)
-                File image = Preferences.cacheConversationBackground(this, data.getData());
+                File image = Preferences.cacheConversationBackground(getActivity(), data.getData());
                 // save to preferences
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 prefs.edit()
                     .putString("pref_background_uri", Uri.fromFile(image).toString())
                     .commit();
@@ -516,18 +487,13 @@ public final class PreferencesActivity extends PreferenceActivity {
             super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public static void start(Activity context) {
-        Intent intent = new Intent(context, PreferencesActivity.class);
-        context.startActivityIfNeeded(intent, -1);
-    }
-
-    static void setupPreferences(final PreferenceActivity activity) {
-        final Preference manualServer = activity.findPreference("pref_network_uri");
+    static void setupPreferences(final PreferenceFragment f) {
+        final Preference manualServer = f.findPreference("pref_network_uri");
         manualServer.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 String value = newValue.toString().trim();
                 if (value.length() > 0 && !EndpointServer.validate(value)) {
-                    new AlertDialog.Builder(activity)
+                    new AlertDialog.Builder(f.getActivity())
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(R.string.pref_network_uri)
                         .setMessage(R.string.err_server_invalid_format)
