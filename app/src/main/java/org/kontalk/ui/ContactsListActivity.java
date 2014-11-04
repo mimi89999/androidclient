@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,13 +47,13 @@ import android.widget.Toast;
 
 
 public class ContactsListActivity extends ActionBarActivity
-        implements ContactsSyncActivity, ContactPickerListener {
+        implements ContactsSyncActivity, ContactPickerListener, SwipeRefreshLayout.OnRefreshListener {
 
     static final String TAG = ContactsListActivity.class.getSimpleName();
 
-    private MenuItem mSyncButton;
-
     private ContactsListFragment mFragment;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,10 +61,6 @@ public class ContactsListActivity extends ActionBarActivity
 
         supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.contacts_list_screen);
-
-        //setSupportProgressBarIndeterminate(true);
-        // HACK this is for crappy honeycomb :)
-        setSupportProgressBarIndeterminateVisibility(false);
 
         mFragment = (ContactsListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_contacts_list);
@@ -74,6 +71,14 @@ public class ContactsListActivity extends ActionBarActivity
         if (!Preferences.getContactsListVisited(this))
             Toast.makeText(this, R.string.msg_do_refresh,
                     Toast.LENGTH_LONG).show();
+
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mRefreshLayout.setOnRefreshListener(this);
+        mRefreshLayout.setRefreshing(false);
+        mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     @Override
@@ -102,8 +107,6 @@ public class ContactsListActivity extends ActionBarActivity
     @Override
     public synchronized boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.contacts_list_menu, menu);
-        mSyncButton = menu.findItem(R.id.menu_refresh);
-        mSyncButton.setVisible(!SyncAdapter.isActive(this));
         return true;
     }
 
@@ -113,10 +116,6 @@ public class ContactsListActivity extends ActionBarActivity
             case android.R.id.home:
                 finish();
                 startActivity(new Intent(this, ConversationList.class));
-                return true;
-
-            case R.id.menu_refresh:
-                startSync(true);
                 return true;
 
             case R.id.menu_invite:
@@ -147,9 +146,7 @@ public class ContactsListActivity extends ActionBarActivity
 
     @Override
     public void setSyncing(boolean syncing) {
-        if (mSyncButton != null)
-            mSyncButton.setVisible(!syncing);
-        setSupportProgressBarIndeterminateVisibility(syncing);
+        mRefreshLayout.setRefreshing(syncing);
     }
 
     private void startInvite() {
@@ -197,6 +194,11 @@ public class ContactsListActivity extends ActionBarActivity
             Toast.makeText(this, R.string.warn_invite_no_app,
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        startSync(true);
     }
 
     public static class DisplayNameComparator implements
