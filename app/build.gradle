@@ -16,26 +16,24 @@ task checkstyle(type: Checkstyle){
         'googleplay/java/org/kontalk/billing/ProductDetails.java',
         'googleplay/java/org/kontalk/billing/Purchase.java'
     // 3rd-party code
-    exclude '**/IconContextMenu.java',
+    exclude '**/IconContextMenu.java', '**/CircularSeekBar.java',
         '**/KeyboardAwareFrameLayout.java'
     classpath = files()
 }
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1'
+    buildToolsVersion '21.1.1'
 
     defaultConfig {
     }
 
     buildTypes {
         release {
-            runProguard true
-            proguardFiles 'proguard.cfg'
+            minifyEnabled true
+            proguardFile 'proguard.cfg'
         }
         debug {
-            runProguard true
-            proguardFiles 'proguard.cfg'
         }
     }
 
@@ -69,7 +67,12 @@ dependencies {
     compile 'dnsjava:dnsjava:2.1.6'
     compile 'com.jcraft:jzlib:+'
     compile 'com.github.machinarius:preferencefragment:0.1.2'
-    compile 'org.igniterealtime.smack:smack-android:4.1.0-alpha3'
+    compile 'com.nineoldandroids:library:2.4.0+'
+    compile 'com.jcraft:jzlib:1.1.3'
+    compile 'org.igniterealtime.smack:smack-android:4.1.0-alpha5'
+    compile 'org.igniterealtime.smack:smack-core:4.1.0-alpha5'
+    compile 'org.igniterealtime.smack:smack-tcp:4.1.0-alpha5'
+    compile 'org.igniterealtime.smack:smack-extensions:4.1.0-alpha5'
 
     googleplayCompile 'com.google.android.gms:play-services:5.0.89'
 }

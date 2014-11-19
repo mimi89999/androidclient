@@ -66,8 +66,6 @@ public class KontalkConnection extends XMPPTCPConnection {
                  server.getNetwork()));
 
         mServer = server;
-        // disable reconnection
-        config.setReconnectionAllowed(false);
         // we don't need the roster
         config.setRosterLoadedAtLogin(false);
         // enable compression
