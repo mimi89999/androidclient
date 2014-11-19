@@ -24,6 +24,7 @@
       <item name="colorAccent">@color/kontalk_accent</item>
       <item name="android:textColorSecondary">@color/kontalk_text_secondary</item>
       <item name="android:alertDialogStyle">@style/DialogStyle</item>
+      <item name="list_selector">@drawable/list_selector</item>
   </style>
 
   <style name="Theme.Light.Subtitle" parent="@style/Theme.Light">

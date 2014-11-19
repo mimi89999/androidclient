@@ -18,6 +18,8 @@
 
 package org.kontalk.ui;
 
+import java.util.LinkedHashMap;
+
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
@@ -29,21 +31,21 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.Html;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,15 +56,13 @@ import org.kontalk.provider.MessagesProvider;
 import org.kontalk.util.Preferences;
 
 
-public class ConversationListFragment extends ListFragment {
+public class ConversationListFragment extends Fragment implements ConversationListAdapter.OnItemClickListener, android.support.v7.view.ActionMode.Callback {
     private static final String TAG = ConversationList.TAG;
 
     private static final int THREAD_LIST_QUERY_TOKEN = 8720;
 
-    /** Context menu group ID for this fragment. */
-    private static final int CONTEXT_MENU_GROUP_ID = 1;
-
     private ThreadListQueryHandler mQueryHandler;
+    private RecyclerView mRecyclerView;
     private ConversationListAdapter mListAdapter;
     private boolean mDualPane;
 
@@ -71,6 +71,8 @@ public class ConversationListFragment extends ListFragment {
     private MenuItem mDeleteAllMenu;
     /** Offline mode menu item. */
     private MenuItem mOfflineMenu;
+
+    private ActionMode mActionMode;
 
     private SearchView mSearchView;
     private SearchManager mSearchManager;
@@ -91,11 +93,17 @@ public class ConversationListFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         mQueryHandler = new ThreadListQueryHandler(getActivity().getContentResolver());
-        mListAdapter = new ConversationListAdapter(getActivity(), null, getListView());
+        mListAdapter = new ConversationListAdapter(getActivity(), null, mRecyclerView);
         mListAdapter.setOnContentChangedListener(mContentChangedListener);
-
-        ListView list = getListView();
+        mListAdapter.addOnItemClickListener(this);
+        mListAdapter.addOnLongItemClickListener(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(llm);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         // Check to see if we have a frame in which to embed the details
         // fragment directly in the containing UI.
@@ -103,29 +111,28 @@ public class ConversationListFragment extends ListFragment {
         mDualPane = detailsFrame != null
                 && detailsFrame.getVisibility() == View.VISIBLE;
 
+
         // add Compose message entry only if are in dual pane mode
         if (!mDualPane) {
-            /*
-            LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+            /*LayoutInflater inflater = getLayoutInflater(savedInstanceState);
             ConversationListItem headerView = (ConversationListItem)
                     inflater.inflate(R.layout.conversation_list_item, list, false);
             headerView.bind(getString(R.string.new_message),
                     getString(R.string.create_new_message));
-            list.addHeaderView(headerView, null, true);
-            */
+            list.addHeaderView(headerView, null, true);*/
         }
         else {
             // TODO restore state
-            list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-            list.setItemsCanFocus(true);
+            /*list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            list.setItemsCanFocus(true);*/
         }
 
         // text for empty conversation list
         TextView text = (TextView) getActivity().findViewById(android.R.id.empty);
         text.setText(Html.fromHtml(getString(R.string.text_conversations_empty)));
 
-        setListAdapter(mListAdapter);
-        registerForContextMenu(list);
+        mRecyclerView.setAdapter(mListAdapter);
+        registerForContextMenu(mRecyclerView);
     }
 
     @Override
@@ -224,82 +231,15 @@ public class ConversationListFragment extends ListFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private static final int MENU_OPEN_THREAD = 1;
-    private static final int MENU_VIEW_CONTACT = 2;
-    private static final int MENU_DELETE_THREAD = 3;
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        ConversationListItem vitem = (ConversationListItem) info.targetView;
-        Conversation conv = vitem.getConversation();
-        if (conv != null) {
-            Contact contact = conv.getContact();
-            String title;
-            if (contact != null)
-                title = contact.getName() != null ? contact.getName() : contact.getNumber();
-            else
-                title = conv.getRecipient();
-
-            menu.setHeaderTitle(title);
-            menu.add(CONTEXT_MENU_GROUP_ID, MENU_OPEN_THREAD, MENU_OPEN_THREAD, R.string.view_conversation);
-            if (contact != null && contact.getId() > 0)
-                menu.add(CONTEXT_MENU_GROUP_ID, MENU_VIEW_CONTACT, MENU_VIEW_CONTACT, R.string.view_contact);
-            menu.add(CONTEXT_MENU_GROUP_ID, MENU_DELETE_THREAD, MENU_DELETE_THREAD, R.string.delete_thread);
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(android.view.MenuItem item) {
-        // not our context
-        if (item.getGroupId() != CONTEXT_MENU_GROUP_ID)
-            return false;
-
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        ConversationListItem vitem = (ConversationListItem) info.targetView;
-        Conversation conv = vitem.getConversation();
-
-        switch (item.getItemId()) {
-            case MENU_OPEN_THREAD:
-                ConversationList parent = getParentActivity();
-                if (parent != null)
-                    parent.openConversation(conv, info.position);
-                return true;
-
-            case MENU_VIEW_CONTACT:
-                Contact contact = conv.getContact();
-                if (contact != null)
-                    startActivity(new Intent(Intent.ACTION_VIEW, contact.getUri()));
-                return true;
-
-            case MENU_DELETE_THREAD:
-                deleteThread(conv.getThreadId());
-                return true;
-        }
-
-        return super.onContextItemSelected(item);
-    }
-
     private void launchDonate() {
         Intent i = new Intent(getActivity(), AboutActivity.class);
         i.setAction(AboutActivity.ACTION_DONATION);
         startActivity(i);
     }
 
-    private void deleteThread(final long threadId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.confirm_delete_thread);
-        builder.setIcon(android.R.drawable.ic_dialog_alert);
-        builder.setMessage(R.string.confirm_will_delete_thread);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                MessagesProvider.deleteThread(getActivity(), threadId);
-                MessagingNotification.updateMessagesNotification(getActivity().getApplicationContext(), false);
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.create().show();
+    private void deleteThread(long threadId) {
+        MessagesProvider.deleteThread(getActivity(), threadId);
+        MessagingNotification.updateMessagesNotification(getActivity().getApplicationContext(), false);
     }
 
     public void chooseContact() {
@@ -358,16 +298,6 @@ public class ConversationListFragment extends ListFragment {
         mListAdapter.changeCursor(null);
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        ConversationListItem cv = (ConversationListItem) v;
-        Conversation conv = cv.getConversation();
-
-        ConversationList parent = getParentActivity();
-        if (parent != null)
-            parent.openConversation(conv, position);
-    }
-
     /** Used only in fragment contexts. */
     public void endConversation(ComposeMessageFragment composer) {
         getFragmentManager().beginTransaction().remove(composer).commit();
@@ -412,6 +342,103 @@ public class ConversationListFragment extends ListFragment {
         // notify the user about the change
         int text = (currentMode) ? R.string.going_online : R.string.going_offline;
         Toast.makeText(ctx, text, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        if (mActionMode != null) {
+            myToggleSelection(position);
+            if (mListAdapter.getSelectedItemCount() > 1) {
+                mActionMode.getMenu().removeItem(R.id.conversation_list_open);
+                mActionMode.getMenu().removeItem(R.id.conversation_list_contact);
+            }
+            //TODO
+            /*else if(mListAdapter.getSelectedItemCount() == 1) {
+                mActionMode.getMenu().clear();
+                mActionMode.getMenuInflater().inflate(R.menu.conversation_list_menu_cab, mActionMode.getMenu());
+            }*/
+            else if (mListAdapter.getSelectedItemCount() < 1) {
+                mActionMode.finish();
+            }
+        }
+        else {
+            ConversationListItem cv = (ConversationListItem) view;
+            Conversation conv = cv.getConversation();
+
+            ConversationList parent = getParentActivity();
+            if (parent != null)
+                parent.openConversation(conv, position);
+        }
+    }
+
+    @Override
+    public void onLongItemClick(View view, int position) {
+        mActionMode = getParentActivity().startSupportActionMode(this);
+        myToggleSelection(position);
+    }
+
+    private void myToggleSelection(int idx) {
+        mListAdapter.toggleSelection(idx);
+        String title = getString(R.string.selected_count, mListAdapter.getSelectedItemCount());
+        mActionMode.setTitle(title);
+    }
+
+    public RecyclerView getRecyclerView() {
+        return mRecyclerView;
+    }
+
+    public CursorRecyclerViewAdapter getAdapter() {
+        return mListAdapter;
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        MenuInflater inflater = actionMode.getMenuInflater();
+        inflater.inflate(R.menu.conversation_list_menu_cab, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        ConversationListItem vitem = (ConversationListItem) mListAdapter.getView();
+        Conversation conv = vitem.getConversation();
+
+        switch (menuItem.getItemId()) {
+            case R.id.conversation_list_open:
+                ConversationList parent = getParentActivity();
+                if (parent != null) {
+                    parent.openConversation(conv, mListAdapter.getCursor().getPosition());
+                }
+                mActionMode.finish();
+                return true;
+            case R.id.conversation_list_contact:
+                Contact contact = conv.getContact();
+                if (contact != null) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, contact.getUri()));
+                }
+                mActionMode.finish();
+                return true;
+            case R.id.conversation_list_delete:
+                LinkedHashMap<Integer, Long> selectedItemPositions = mListAdapter.getSelectedItems();
+                for (Object key : selectedItemPositions.keySet()) {
+                    long value = selectedItemPositions.get(key);
+                    deleteThread(value);
+                }
+                mActionMode.finish();
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+        mActionMode = null;
+        mListAdapter.clearSelections();
     }
 
     /**

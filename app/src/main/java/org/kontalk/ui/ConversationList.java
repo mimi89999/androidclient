@@ -37,7 +37,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.InputType;
 import android.view.View;
-import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import org.kontalk.R;
@@ -253,9 +252,9 @@ public class ConversationList extends ActionBarActivity
     public boolean onSearchRequested() {
         ConversationListFragment fragment = getListFragment();
 
-        ListAdapter list = fragment.getListAdapter();
+        CursorRecyclerViewAdapter list = fragment.getAdapter();
         // no data found
-        if (list == null || list.getCount() == 0)
+        if (list == null || list.getCursor().getCount() == 0)
             return false;
 
         startSearch(null, false, null, false);
@@ -343,7 +342,7 @@ public class ConversationList extends ActionBarActivity
 
     public void openConversation(Conversation conv, int position) {
         if (isDualPane()) {
-            mFragment.getListView().setItemChecked(position, true);
+            //mFragment.getRecyclerView().setItemChecked(position, true);
 
             // get the old fragment
             ComposeMessageFragment f = (ComposeMessageFragment) getSupportFragmentManager()

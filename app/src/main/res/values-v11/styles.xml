@@ -26,6 +26,7 @@
       <item name="colorPrimaryDark">@color/kontalk_primary_dark</item>
       <item name="colorAccent">@color/kontalk_accent</item>
       <item name="android:textColorSecondary">@color/kontalk_text_secondary</item>
+      <item name="list_selector">@drawable/list_selector</item>
   </style>
 
   <style name="Theme.Light.Subtitle" parent="@style/Theme.Light">

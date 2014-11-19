@@ -21,18 +21,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <ListView android:id="@android:id/list"
-        style="?android:attr/listViewWhiteStyle"
+    <android.support.v7.widget.RecyclerView android:id="@+id/recyclerView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:drawSelectorOnTop="false"
         android:scrollbarStyle="insideOverlay"
-        android:background="@color/compose_message_list_background"
-        android:cacheColorHint="@color/compose_message_list_background"
         android:transcriptMode="disabled"
         android:fadingEdgeLength="8dp">
         <!-- Preview: listitem=@layout/conversation_list_item -->
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
     <TextView android:id="@android:id/empty"
         android:layout_width="wrap_content"

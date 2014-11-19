@@ -21,6 +21,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
+    android:background="?list_selector"
+    android:focusable="true"
+    android:clickable="true"
     android:paddingRight="10dip" >
     <!-- android:background="@drawable/conversation_item_background_unread" -->
 

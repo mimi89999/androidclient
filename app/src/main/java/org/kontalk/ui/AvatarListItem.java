@@ -61,7 +61,8 @@ public abstract class AvatarListItem extends RelativeLayout implements ContactCa
         mAvatarView = (QuickContactBadge) findViewById(R.id.avatar);
 
         if (isInEditMode()) {
-            mAvatarView.setImageDrawable(sDefaultContactImage);
+            RoundImage r = new RoundImage(sDefaultContactImage);
+            mAvatarView.setImageDrawable(r);
             mAvatarView.setVisibility(VISIBLE);
         }
     }
@@ -71,13 +72,15 @@ public abstract class AvatarListItem extends RelativeLayout implements ContactCa
             // we mark this with the contact's hash code for the async avatar
             mAvatarView.setTag(contact.hashCode());
             mAvatarView.assignContactUri(contact.getUri());
-            mAvatarView.setImageDrawable(sDefaultContactImage);
+            RoundImage r = new RoundImage(sDefaultContactImage);
+            mAvatarView.setImageDrawable(r);
             // laod avatar asynchronously
             contact.getAvatarAsync(getContext(), this);
         }
         else {
             mAvatarView.setTag(null);
-            mAvatarView.setImageDrawable(sDefaultContactImage);
+            RoundImage r = new RoundImage(sDefaultContactImage);
+            mAvatarView.setImageDrawable(r);
         }
     }
 
@@ -102,8 +105,10 @@ public abstract class AvatarListItem extends RelativeLayout implements ContactCa
             // be sure the contact is still the same
             // this is an insane workaround against race conditions
             Integer contactTag = (Integer) mAvatarView.getTag();
-            if (contactTag != null && contactTag.intValue() == contact.hashCode())
-                mAvatarView.setImageDrawable(avatar);
+            if (contactTag != null && contactTag.intValue() == contact.hashCode()) {
+                RoundImage r = new RoundImage(avatar);
+                mAvatarView.setImageDrawable(r);
+            }
         }
         catch (Exception e) {
             // we are deliberately ignoring any exception here

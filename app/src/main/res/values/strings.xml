@@ -357,4 +357,6 @@
 
     <string name="err_server_invalid_format">Invalid address format.</string>
 
+    <string name="selected_count">%1$s</string>
+
 </resources>
