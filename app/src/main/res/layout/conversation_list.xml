@@ -31,7 +31,7 @@
         <!-- Preview: listitem=@layout/conversation_list_item -->
     </android.support.v7.widget.RecyclerView>
 
-    <TextView android:id="@android:id/empty"
+    <TextView android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

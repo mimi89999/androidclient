@@ -65,6 +65,7 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
     private RecyclerView mRecyclerView;
     private ConversationListAdapter mListAdapter;
     private boolean mDualPane;
+    private TextView mTextEmpty;
 
     /** Search menu item. */
     private MenuItem mSearchMenu;
@@ -93,17 +94,27 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mTextEmpty = (TextView) getActivity().findViewById(R.id.empty);
         mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         mQueryHandler = new ThreadListQueryHandler(getActivity().getContentResolver());
         mListAdapter = new ConversationListAdapter(getActivity(), null, mRecyclerView);
         mListAdapter.setOnContentChangedListener(mContentChangedListener);
+        mListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkAdapterIsEmpty();
+            }
+        });
         mListAdapter.addOnItemClickListener(this);
         mListAdapter.addOnLongItemClickListener(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mListAdapter);
+        checkAdapterIsEmpty();
 
         // Check to see if we have a frame in which to embed the details
         // fragment directly in the containing UI.
@@ -128,11 +139,7 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
         }
 
         // text for empty conversation list
-        TextView text = (TextView) getActivity().findViewById(android.R.id.empty);
-        text.setText(Html.fromHtml(getString(R.string.text_conversations_empty)));
-
-        mRecyclerView.setAdapter(mListAdapter);
-        registerForContextMenu(mRecyclerView);
+        mTextEmpty.setText(Html.fromHtml(getString(R.string.text_conversations_empty)));
     }
 
     @Override
@@ -476,4 +483,14 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
         return mDualPane;
     }
 
+    private void checkAdapterIsEmpty() {
+        if(mListAdapter.getItemCount() == 0) {
+            mRecyclerView.setVisibility(View.GONE);
+            mTextEmpty.setVisibility(View.VISIBLE);
+        }
+        else {
+            mTextEmpty.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 }
