@@ -23,8 +23,12 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,10 +43,11 @@ import org.kontalk.util.RunnableBroadcastReceiver;
 
 
 /** Contacts list selection fragment. */
-public class ContactsListFragment extends ListFragment
-        implements ContactsListAdapter.OnContentChangedListener {
+public class ContactsListFragment extends Fragment
+        implements ContactsListAdapter.OnContentChangedListener, OnItemClickListener {
 
     private Cursor mCursor;
+    private RecyclerView mRecyclerView;
     private ContactsListAdapter mListAdapter;
 
     private LocalBroadcastManager mBroadcastManager;
@@ -80,9 +85,16 @@ public class ContactsListFragment extends ListFragment
 
         Activity parent = getActivity();
 
-        mListAdapter = new ContactsListAdapter(parent, getListView());
+        mRecyclerView = (RecyclerView) parent.findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(parent);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        mListAdapter = new ContactsListAdapter(parent, null, mRecyclerView);
         mListAdapter.setOnContentChangedListener(this);
-        setListAdapter(mListAdapter);
+        mListAdapter.addOnItemClickListener(this);
+        mRecyclerView.setLayoutManager(llm);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mListAdapter);
 
         mHandler = new Handler();
         mBroadcastManager = LocalBroadcastManager.getInstance(parent);
@@ -120,13 +132,13 @@ public class ContactsListFragment extends ListFragment
         startQuery();
     }
 
-    @Override
+    /*@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         ContactPickerListener parent = (ContactPickerListener) getActivity();
 
         if (parent != null)
             parent.onContactSelected(this, ((ContactsListItem) v).getContact());
-    }
+    }*/
 
     private void registerSyncReceiver() {
         // register sync monitor
@@ -149,4 +161,16 @@ public class ContactsListFragment extends ListFragment
         startQuery();
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+        ContactPickerListener parent = (ContactPickerListener) getActivity();
+
+        if (parent != null)
+            parent.onContactSelected(this, ((ContactsListItem) view).getContact());
+    }
+
+    @Override
+    public void onLongItemClick(View view, int position) {
+
+    }
 }

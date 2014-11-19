@@ -38,7 +38,7 @@ public class ConversationListAdapter extends CursorRecyclerViewAdapter<Conversat
 
     private final LayoutInflater mFactory;
     private OnContentChangedListener mOnContentChangedListener;
-    OnItemClickListener mItemClickListener;
+    private OnItemClickListener mItemClickListener;
     private LinkedHashMap<Integer, Long> mSelectedItems;
     private View mView;
     Conversation mConv;
@@ -109,16 +109,11 @@ public class ConversationListAdapter extends CursorRecyclerViewAdapter<Conversat
         }
     }
 
-    public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
-        public void onLongItemClick(View view, int position);
-    }
-
-    public void addOnItemClickListener(final OnItemClickListener mItemClickListener) {
+    public void addOnItemClickListener(final org.kontalk.ui.OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 
-    public void addOnLongItemClickListener(final  OnItemClickListener mItemClickListener) {
+    public void addOnLongItemClickListener(final org.kontalk.ui.OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 

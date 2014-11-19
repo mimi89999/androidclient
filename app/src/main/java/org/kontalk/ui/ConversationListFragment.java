@@ -56,7 +56,7 @@ import org.kontalk.provider.MessagesProvider;
 import org.kontalk.util.Preferences;
 
 
-public class ConversationListFragment extends Fragment implements ConversationListAdapter.OnItemClickListener, android.support.v7.view.ActionMode.Callback {
+public class ConversationListFragment extends Fragment implements OnItemClickListener, android.support.v7.view.ActionMode.Callback {
     private static final String TAG = ConversationList.TAG;
 
     private static final int THREAD_LIST_QUERY_TOKEN = 8720;

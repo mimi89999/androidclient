@@ -22,8 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView android:id="@android:id/list"
-	    style="?android:attr/listViewStyle"
+    <android.support.v7.widget.RecyclerView android:id="@+id/recyclerView"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
 	    android:paddingLeft="@dimen/contacts_list_margin_left"
@@ -36,8 +35,9 @@
 	    android:fastScrollEnabled="true"
 	    android:fastScrollAlwaysVisible="true"
 	    android:scrollbarStyle="outsideOverlay"
-	    android:visibility="gone"
-	    android:fadingEdgeLength="16dip" />
+	    android:visibility="visible"
+	    android:fadingEdgeLength="16dip">
+    </android.support.v7.widget.RecyclerView>
 
     <TextView android:id="@android:id/empty"
         android:layout_width="wrap_content"

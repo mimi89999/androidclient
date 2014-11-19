@@ -20,6 +20,7 @@ package org.kontalk.ui;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,42 +31,81 @@ import android.widget.ListView;
 
 import org.kontalk.R;
 import org.kontalk.data.Contact;
+import org.kontalk.data.Conversation;
 
 
-public class ContactsListAdapter extends CursorAdapter {
+public class ContactsListAdapter extends CursorRecyclerViewAdapter<ContactsListAdapter.ViewHolder> {
     private static final String TAG = ContactsListActivity.TAG;
 
     private final LayoutInflater mFactory;
     private OnContentChangedListener mOnContentChangedListener;
+    private OnItemClickListener mItemClickListener;
+    private View mView;
 
-    public ContactsListAdapter(Context context, ListView list) {
-        super(context, null, false);
+    public ContactsListAdapter(Context context, Cursor cursor, RecyclerView list) {
+        super(context, cursor);
         mFactory = LayoutInflater.from(context);
 
-        list.setRecyclerListener(new RecyclerListener() {
+        /*list.setRecyclerListener(new RecyclerListener() {
             public void onMovedToScrapHeap(View view) {
                 if (view instanceof MessageListItem) {
                     ((ContactsListItem) view).unbind();
                 }
             }
-        });
+        });*/
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        if (!(view instanceof ContactsListItem)) {
-            Log.e(TAG, "Unexpected bound view: " + view);
+    public void onBindViewHolder(ViewHolder viewHolder, Context context, Cursor cursor) {
+        if (!(viewHolder.mHeaderview instanceof ContactsListItem)) {
+            Log.e(TAG, "Unexpected bound view: " + viewHolder);
             return;
         }
 
-        ContactsListItem headerView = (ContactsListItem) view;
         Contact contact = Contact.fromUsersCursor(context, cursor);
-        headerView.bind(context, contact);
+        viewHolder.mHeaderview.bind(context, contact);
+        mView = viewHolder.mHeaderview;
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return mFactory.inflate(R.layout.contacts_list_item, parent, false);
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View itemView = mFactory.inflate(R.layout.contacts_list_item, viewGroup, false);
+        ViewHolder vh = new ViewHolder(itemView);
+        return vh;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        ContactsListItem mHeaderview;
+        public ViewHolder(View view) {
+            super(view);
+            mHeaderview = (ContactsListItem) view;
+            mHeaderview.setOnClickListener(this);
+            mHeaderview.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(v, getPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (mItemClickListener != null) {
+                mItemClickListener.onLongItemClick(v, getPosition());
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public void addOnItemClickListener(final org.kontalk.ui.OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
+    }
+
+    public void addOnLongItemClickListener(final org.kontalk.ui.OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
     }
 
     public interface OnContentChangedListener {
