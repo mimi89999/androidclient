@@ -35,16 +35,24 @@
 	    android:fastScrollEnabled="true"
 	    android:fastScrollAlwaysVisible="true"
 	    android:scrollbarStyle="outsideOverlay"
-	    android:visibility="visible"
+        android:visibility="gone"
 	    android:fadingEdgeLength="16dip">
     </android.support.v7.widget.RecyclerView>
 
-    <TextView android:id="@android:id/empty"
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+    <TextView android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="10dip"
         android:maxLines="20"
+        android:textColor="#000000"
+        android:visibility="visible"
+        android:text="Ciao"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>
