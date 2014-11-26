@@ -50,6 +50,8 @@ public class ContactsListFragment extends Fragment
     private RecyclerView mRecyclerView;
     private ContactsListAdapter mListAdapter;
 
+    private TextView mTextEmpty;
+
     private LocalBroadcastManager mBroadcastManager;
 
     private RunnableBroadcastReceiver mSyncMonitor;
@@ -73,8 +75,8 @@ public class ContactsListFragment extends Fragment
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.contacts_list, container, false);
 
-        TextView text = (TextView) view.findViewById(android.R.id.empty);
-        text.setText(Html.fromHtml(getString(R.string.text_contacts_empty)));
+        mTextEmpty = (TextView) view.findViewById(R.id.empty);
+        mTextEmpty.setText(Html.fromHtml(getString(R.string.text_contacts_empty)));
 
         return view;
     }
@@ -92,12 +94,21 @@ public class ContactsListFragment extends Fragment
         mListAdapter = new ContactsListAdapter(parent, null, mRecyclerView);
         mListAdapter.setOnContentChangedListener(this);
         mListAdapter.addOnItemClickListener(this);
+        mListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkAdapterIsEmpty();
+            }
+        });
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mListAdapter);
 
         mHandler = new Handler();
         mBroadcastManager = LocalBroadcastManager.getInstance(parent);
+
+        checkAdapterIsEmpty();
 
         // retain current sync state to hide the refresh button and start indeterminate progress
         registerSyncReceiver();
@@ -132,14 +143,6 @@ public class ContactsListFragment extends Fragment
         startQuery();
     }
 
-    /*@Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        ContactPickerListener parent = (ContactPickerListener) getActivity();
-
-        if (parent != null)
-            parent.onContactSelected(this, ((ContactsListItem) v).getContact());
-    }*/
-
     private void registerSyncReceiver() {
         // register sync monitor
         if (mSyncMonitor == null) {
@@ -172,5 +175,16 @@ public class ContactsListFragment extends Fragment
     @Override
     public void onLongItemClick(View view, int position) {
 
+    }
+
+    private void checkAdapterIsEmpty() {
+        if(mListAdapter.getItemCount() == 0) {
+            mRecyclerView.setVisibility(View.GONE);
+            mTextEmpty.setVisibility(View.VISIBLE);
+        }
+        else {
+            mTextEmpty.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }
