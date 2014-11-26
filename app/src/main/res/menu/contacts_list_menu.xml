@@ -20,5 +20,6 @@
     >
 
     <!-- menu -->
+    <item android:id="@+id/menu_refresh" android:title="@string/menu_refresh" android:icon="@drawable/ic_menu_refresh"/>
     <item android:id="@+id/menu_invite" android:title="@string/menu_invite" android:icon="@drawable/ic_menu_invite"/>
 </menu>

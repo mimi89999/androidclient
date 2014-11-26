@@ -118,6 +118,10 @@ public class ContactsListActivity extends ActionBarActivity
                 startActivity(new Intent(this, ConversationList.class));
                 return true;
 
+            case R.id.menu_refresh:
+                startSync(true);
+                return true;
+
             case R.id.menu_invite:
                 startInvite();
                 return true;
@@ -140,6 +144,7 @@ public class ContactsListActivity extends ActionBarActivity
                 setSyncing(true);
         }
         else if (errorWarning) {
+            setSyncing(false);
             Toast.makeText(this, R.string.err_sync_nonetwork, Toast.LENGTH_LONG).show();
         }
     }
