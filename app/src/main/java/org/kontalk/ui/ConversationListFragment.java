@@ -55,8 +55,10 @@ import org.kontalk.data.Conversation;
 import org.kontalk.provider.MessagesProvider;
 import org.kontalk.util.Preferences;
 
+import android.support.v7.view.ActionMode.Callback;
 
-public class ConversationListFragment extends Fragment implements OnItemClickListener, android.support.v7.view.ActionMode.Callback {
+
+public class ConversationListFragment extends Fragment implements OnItemClickListener, Callback {
     private static final String TAG = ConversationList.TAG;
 
     private static final int THREAD_LIST_QUERY_TOKEN = 8720;
@@ -431,12 +433,22 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
                 mActionMode.finish();
                 return true;
             case R.id.conversation_list_delete:
-                LinkedHashMap<Integer, Long> selectedItemPositions = mListAdapter.getSelectedItems();
-                for (Object key : selectedItemPositions.keySet()) {
-                    long value = selectedItemPositions.get(key);
-                    deleteThread(value);
-                }
-                mActionMode.finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.confirm_delete_message);
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.setMessage(R.string.confirm_will_delete_message);
+                builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        LinkedHashMap<Integer, Long> selectedItemPositions = mListAdapter.getSelectedItems();
+                        for (Object key : selectedItemPositions.keySet()) {
+                            long value = selectedItemPositions.get(key);
+                            deleteThread(value);
+                        }
+                        mActionMode.finish();
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, null);
+                builder.create().show();
                 return true;
         }
         return false;

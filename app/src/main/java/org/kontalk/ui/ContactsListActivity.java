@@ -74,7 +74,6 @@ public class ContactsListActivity extends ActionBarActivity
 
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         mRefreshLayout.setOnRefreshListener(this);
-        mRefreshLayout.setRefreshing(false);
         mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
