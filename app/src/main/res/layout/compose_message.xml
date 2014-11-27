@@ -34,7 +34,7 @@
             android:id="@+id/invitation_bar"
             android:visibility="gone"/>
 
-        <ListView android:id="@android:id/list"
+        <android.support.v7.widget.RecyclerView android:id="@+id/recyclerView"
             style="?android:attr/listViewWhiteStyle"
             android:background="@color/compose_message_list_background"
             android:cacheColorHint="@color/compose_message_list_background"
@@ -54,7 +54,7 @@
             android:fadingEdgeLength="8dp"
             >
             <!-- Preview: listitem=@layout/message_list_item -->
-        </ListView>
+        </android.support.v7.widget.RecyclerView>
 
         <include layout="@layout/composer_bar"/>
 

@@ -65,8 +65,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract.Contacts;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.Html;
@@ -134,7 +138,7 @@ import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_UNBLOCK
  * The composer fragment.
  * @author Daniele Ricci
  */
-public class ComposeMessageFragment extends ListFragment implements
+public class ComposeMessageFragment extends Fragment implements
         View.OnLongClickListener, IconContextMenuOnClickListener,
         // TODO these two interfaces should be handled by an inner class
         OnAudioDialogResult, AudioPlayerControl,
@@ -169,6 +173,8 @@ public class ComposeMessageFragment extends ListFragment implements
     private MenuItem mCallMenu;
     private MenuItem mBlockMenu;
     private MenuItem mUnblockMenu;
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLinearLayoutManager;
 
     /** The thread id. */
     private long threadId = -1;
@@ -255,21 +261,27 @@ public class ComposeMessageFragment extends ListFragment implements
         super.onActivityCreated(savedInstanceState);
         // setListAdapter() is post-poned
 
-        ListView list = getListView();
-        list.setFastScrollEnabled(true);
-        registerForContextMenu(list);
+        mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        registerForContextMenu(mRecyclerView);
 
         // footer (for tablet presence status)
         mStatusText = (TextView) getView().findViewById(R.id.status_text);
 
+        //TODO
         // set custom background (if any)
-        Drawable bg = Preferences.getConversationBackground(getActivity());
+        /*Drawable bg = Preferences.getConversationBackground(getActivity());
         if (bg != null) {
             ImageView background = (ImageView) getView().findViewById(R.id.background);
             list.setCacheColorHint(Color.TRANSPARENT);
             list.setBackgroundColor(Color.TRANSPARENT);
             background.setImageDrawable(bg);
-        }
+        }*/
 
         mTextEntry = (EditText) getView().findViewById(R.id.text_editor);
 
@@ -675,7 +687,7 @@ public class ComposeMessageFragment extends ListFragment implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         MessageListItem item = (MessageListItem) view;
         final CompositeMessage msg = item.getMessage();
@@ -724,7 +736,7 @@ public class ComposeMessageFragment extends ListFragment implements
                 builder.show();
             }
         }
-    }
+    }*/
 
     private void startDownload(CompositeMessage msg) {
         AttachmentComponent attachment = (AttachmentComponent) msg
@@ -1533,9 +1545,9 @@ public class ComposeMessageFragment extends ListFragment implements
             }
 
             mListAdapter = new MessageListAdapter(getActivity(), null,
-                    highlight, getListView(), this);
+                    highlight, null, this);
             mListAdapter.setOnContentChangedListener(mContentChangedListener);
-            setListAdapter(mListAdapter);
+            mRecyclerView.setAdapter(mListAdapter);
         }
 
         if (threadId > 0) {
@@ -2452,7 +2464,8 @@ public class ComposeMessageFragment extends ListFragment implements
 
                         mListAdapter.changeCursor(cursor);
                         if (newSelectionPos > 0)
-                            getListView().setSelection(newSelectionPos);
+                            //TODO
+                            //getListView().setSelection(newSelectionPos);
 
                         getActivity().setProgressBarIndeterminateVisibility(false);
                         updateUI();
