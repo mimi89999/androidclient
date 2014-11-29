@@ -80,6 +80,7 @@ public class MessageListAdapter extends CursorRecyclerViewAdapter<MessageListAda
             cursor.moveToNext();
         }
 
+        viewHolder.setIsRecyclable(false);
         viewHolder.mHeaderview.bind(context, msg, mContact, mHighlight, previous, mAudioPlayerControl);
     }
 

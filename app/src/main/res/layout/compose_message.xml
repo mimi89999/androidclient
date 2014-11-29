@@ -44,8 +44,6 @@
             android:layout_height="0dp"
             android:layout_weight="1.0"
             android:drawSelectorOnTop="false"
-            android:transcriptMode="normal"
-            android:smoothScrollbar="false"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:fastScrollEnabled="true"
             android:fastScrollAlwaysVisible="true"

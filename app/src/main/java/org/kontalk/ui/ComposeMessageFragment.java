@@ -263,8 +263,10 @@ public class ComposeMessageFragment extends Fragment implements
 
         mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
-        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager = new LinearLayoutManager(getParentActivity());
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mLinearLayoutManager.setSmoothScrollbarEnabled(true);
+        mLinearLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
