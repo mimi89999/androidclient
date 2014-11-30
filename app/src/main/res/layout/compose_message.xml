@@ -34,7 +34,7 @@
             android:id="@+id/invitation_bar"
             android:visibility="gone"/>
 
-        <android.support.v7.widget.RecyclerView android:id="@+id/recyclerView"
+        <ListView android:id="@android:id/list"
             style="?android:attr/listViewWhiteStyle"
             android:background="@color/compose_message_list_background"
             android:cacheColorHint="@color/compose_message_list_background"
@@ -44,6 +44,8 @@
             android:layout_height="0dp"
             android:layout_weight="1.0"
             android:drawSelectorOnTop="false"
+            android:transcriptMode="normal"
+            android:smoothScrollbar="false"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:fastScrollEnabled="true"
             android:fastScrollAlwaysVisible="true"
@@ -52,7 +54,7 @@
             android:fadingEdgeLength="8dp"
             >
             <!-- Preview: listitem=@layout/message_list_item -->
-        </android.support.v7.widget.RecyclerView>
+        </ListView>
 
         <include layout="@layout/composer_bar"/>
 

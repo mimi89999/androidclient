@@ -65,12 +65,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract.Contacts;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.Html;
@@ -138,7 +134,7 @@ import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_UNBLOCK
  * The composer fragment.
  * @author Daniele Ricci
  */
-public class ComposeMessageFragment extends Fragment implements OnItemClickListener,
+public class ComposeMessageFragment extends ListFragment implements
         View.OnLongClickListener, IconContextMenuOnClickListener,
         // TODO these two interfaces should be handled by an inner class
         OnAudioDialogResult, AudioPlayerControl,
@@ -173,8 +169,6 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
     private MenuItem mCallMenu;
     private MenuItem mBlockMenu;
     private MenuItem mUnblockMenu;
-    private RecyclerView mRecyclerView;
-    private LinearLayoutManager mLinearLayoutManager;
 
     /** The thread id. */
     private long threadId = -1;
@@ -261,16 +255,9 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
         super.onActivityCreated(savedInstanceState);
         // setListAdapter() is post-poned
 
-        mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
-        mLinearLayoutManager = new LinearLayoutManager(getParentActivity());
-        mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mLinearLayoutManager.setSmoothScrollbarEnabled(true);
-        mLinearLayoutManager.setStackFromEnd(true);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        registerForContextMenu(mRecyclerView);
+        ListView list = getListView();
+        list.setFastScrollEnabled(true);
+        registerForContextMenu(list);
 
         // footer (for tablet presence status)
         mStatusText = (TextView) getView().findViewById(R.id.status_text);
@@ -279,8 +266,8 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
         Drawable bg = Preferences.getConversationBackground(getActivity());
         if (bg != null) {
             ImageView background = (ImageView) getView().findViewById(R.id.background);
-            mRecyclerView.setDrawingCacheBackgroundColor(Color.TRANSPARENT);
-            mRecyclerView.setBackgroundColor(Color.TRANSPARENT);
+            list.setCacheColorHint(Color.TRANSPARENT);
+            list.setBackgroundColor(Color.TRANSPARENT);
             background.setImageDrawable(bg);
         }
 
@@ -406,10 +393,8 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
 
     private final MessageListAdapter.OnContentChangedListener mContentChangedListener = new MessageListAdapter.OnContentChangedListener() {
         public void onContentChanged(MessageListAdapter adapter) {
-            if (isVisible()) {
+            if (isVisible())
                 startQuery(true, false);
-                mListAdapter.notifyItemInserted(mListAdapter.getCursor().getCount());
-            }
         }
     };
 
@@ -691,12 +676,12 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
     }
 
     @Override
-    public void onItemClick(View view, int position) {
+    public void onListItemClick(ListView listView, View view, int position, long id) {
         MessageListItem item = (MessageListItem) view;
         final CompositeMessage msg = item.getMessage();
 
         AttachmentComponent attachment = (AttachmentComponent) msg
-            .getComponent(AttachmentComponent.class);
+                .getComponent(AttachmentComponent.class);
 
         if (attachment != null && (attachment.getFetchUrl() != null || attachment.getLocalUri() != null)) {
 
@@ -704,7 +689,8 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
             if (attachment.getLocalUri() != null) {
                 // open file
                 openFile(msg);
-            } else {
+            }
+            else {
                 // info & download dialog
                 CharSequence message = MessageUtils
                     .getFileInfoMessage(getActivity(), msg,
@@ -724,7 +710,8 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
                         }
                     };
                     builder.setPositiveButton(R.string.download, startDL);
-                } else {
+                }
+                else {
                     DialogInterface.OnClickListener stopDL = new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // cancel file download
@@ -737,11 +724,6 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
                 builder.show();
             }
         }
-    }
-
-    @Override
-    public void onLongItemClick(View view, int position) {
-        //TODO
     }
 
     private void startDownload(CompositeMessage msg) {
@@ -1551,19 +1533,9 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
             }
 
             mListAdapter = new MessageListAdapter(getActivity(), null,
-                    highlight, null, this);
+                    highlight, getListView(), this);
             mListAdapter.setOnContentChangedListener(mContentChangedListener);
-            mListAdapter.addOnItemClickListener(this);
-            mListAdapter.addOnLongItemClickListener(this);
-            //TODO very preliminary!!
-            mListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onItemRangeInserted(int positionStart, int itemCount) {
-                    super.onItemRangeInserted(positionStart, itemCount);
-                    mLinearLayoutManager.scrollToPosition(mLinearLayoutManager.findLastCompletelyVisibleItemPosition()+1);
-                }
-            });
-            mRecyclerView.setAdapter(mListAdapter);
+            setListAdapter(mListAdapter);
         }
 
         if (threadId > 0) {
@@ -2480,8 +2452,7 @@ public class ComposeMessageFragment extends Fragment implements OnItemClickListe
 
                         mListAdapter.changeCursor(cursor);
                         if (newSelectionPos > 0)
-                            //TODO
-                            //getListView().setSelection(newSelectionPos);
+                            getListView().setSelection(newSelectionPos);
 
                         getActivity().setProgressBarIndeterminateVisibility(false);
                         updateUI();

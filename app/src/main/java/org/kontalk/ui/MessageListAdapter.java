@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,96 +35,33 @@ import org.kontalk.data.Contact;
 import org.kontalk.message.CompositeMessage;
 import org.kontalk.provider.MyMessages.Messages;
 
-public class MessageListAdapter extends CursorRecyclerViewAdapter<MessageListAdapter.ViewHolder> {
+public class MessageListAdapter extends CursorAdapter {
 
     private static final String TAG = ComposeMessage.TAG;
 
     private final LayoutInflater mFactory;
     private final Pattern mHighlight;
     private OnContentChangedListener mOnContentChangedListener;
-    private OnItemClickListener mItemClickListener;
 
     private Contact mContact;
     private AudioPlayerControl mAudioPlayerControl;
 
-    public MessageListAdapter(Context context, Cursor cursor, Pattern highlight, RecyclerView list, AudioPlayerControl audioPlayerControl) {
-        super(context, cursor);
+    public MessageListAdapter(Context context, Cursor cursor, Pattern highlight, ListView list, AudioPlayerControl audioPlayerControl) {
+        super(context, cursor, false);
         mFactory = LayoutInflater.from(context);
         mHighlight = highlight;
         mAudioPlayerControl = audioPlayerControl;
 
-        /*list.setRecyclerListener(new RecyclerListener() {
+        list.setRecyclerListener(new RecyclerListener() {
             public void onMovedToScrapHeap(View view) {
                 if (view instanceof MessageListItem) {
                     ((MessageListItem) view).unbind();
                 }
             }
-        });*/
+        });
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, Context context, Cursor cursor) {
-        if (!(viewHolder.mHeaderview instanceof MessageListItem)) {
-            Log.e(TAG, "unexpected bound view: " + viewHolder);
-            return;
-        }
-
-        CompositeMessage msg = CompositeMessage.fromCursor(context, cursor);
-        if (msg.getDirection() == Messages.DIRECTION_IN && mContact == null)
-            mContact = Contact.findByUserId(context, msg.getSender());
-
-        long previous = -1;
-        if (cursor.moveToPrevious()) {
-            previous = cursor.getLong(CompositeMessage.COLUMN_TIMESTAMP);
-            cursor.moveToNext();
-        }
-
-        viewHolder.setIsRecyclable(false);
-        viewHolder.mHeaderview.bind(context, msg, mContact, mHighlight, previous, mAudioPlayerControl);
-    }
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View itemView = mFactory.inflate(R.layout.message_list_item, viewGroup, false);
-        ViewHolder vh = new ViewHolder(itemView);
-        return vh;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        MessageListItem mHeaderview;
-        public ViewHolder(View view) {
-            super(view);
-            mHeaderview = (MessageListItem) view;
-            mHeaderview.setOnClickListener(this);
-            mHeaderview.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getPosition());
-            }
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            if (mItemClickListener != null) {
-                mItemClickListener.onLongItemClick(v, getPosition());
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public void addOnItemClickListener(final org.kontalk.ui.OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
-    }
-
-    public void addOnLongItemClickListener(final org.kontalk.ui.OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
-    }
-
-    /*@Override
     public void bindView(View view, Context context, Cursor cursor) {
         if (!(view instanceof MessageListItem)) {
             Log.e(TAG, "unexpected bound view: " + view);
@@ -144,12 +80,12 @@ public class MessageListAdapter extends CursorRecyclerViewAdapter<MessageListAda
         }
 
         headerView.bind(context, msg, mContact, mHighlight, previous, mAudioPlayerControl);
-    }*/
+    }
 
-    /*@Override
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return mFactory.inflate(R.layout.message_list_item, parent, false);
-    }*/
+    }
 
     public interface OnContentChangedListener {
         void onContentChanged(MessageListAdapter adapter);
