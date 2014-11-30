@@ -138,7 +138,7 @@ import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_UNBLOCK
  * The composer fragment.
  * @author Daniele Ricci
  */
-public class ComposeMessageFragment extends Fragment implements
+public class ComposeMessageFragment extends Fragment implements OnItemClickListener,
         View.OnLongClickListener, IconContextMenuOnClickListener,
         // TODO these two interfaces should be handled by an inner class
         OnAudioDialogResult, AudioPlayerControl,
@@ -275,15 +275,14 @@ public class ComposeMessageFragment extends Fragment implements
         // footer (for tablet presence status)
         mStatusText = (TextView) getView().findViewById(R.id.status_text);
 
-        //TODO
         // set custom background (if any)
-        /*Drawable bg = Preferences.getConversationBackground(getActivity());
+        Drawable bg = Preferences.getConversationBackground(getActivity());
         if (bg != null) {
             ImageView background = (ImageView) getView().findViewById(R.id.background);
-            list.setCacheColorHint(Color.TRANSPARENT);
-            list.setBackgroundColor(Color.TRANSPARENT);
+            mRecyclerView.setDrawingCacheBackgroundColor(Color.TRANSPARENT);
+            mRecyclerView.setBackgroundColor(Color.TRANSPARENT);
             background.setImageDrawable(bg);
-        }*/
+        }
 
         mTextEntry = (EditText) getView().findViewById(R.id.text_editor);
 
@@ -407,8 +406,10 @@ public class ComposeMessageFragment extends Fragment implements
 
     private final MessageListAdapter.OnContentChangedListener mContentChangedListener = new MessageListAdapter.OnContentChangedListener() {
         public void onContentChanged(MessageListAdapter adapter) {
-            if (isVisible())
+            if (isVisible()) {
                 startQuery(true, false);
+                mListAdapter.notifyItemInserted(mListAdapter.getCursor().getCount());
+            }
         }
     };
 
@@ -689,13 +690,13 @@ public class ComposeMessageFragment extends Fragment implements
         return super.onOptionsItemSelected(item);
     }
 
-    /*@Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
+    @Override
+    public void onItemClick(View view, int position) {
         MessageListItem item = (MessageListItem) view;
         final CompositeMessage msg = item.getMessage();
 
         AttachmentComponent attachment = (AttachmentComponent) msg
-                .getComponent(AttachmentComponent.class);
+            .getComponent(AttachmentComponent.class);
 
         if (attachment != null && (attachment.getFetchUrl() != null || attachment.getLocalUri() != null)) {
 
@@ -703,8 +704,7 @@ public class ComposeMessageFragment extends Fragment implements
             if (attachment.getLocalUri() != null) {
                 // open file
                 openFile(msg);
-            }
-            else {
+            } else {
                 // info & download dialog
                 CharSequence message = MessageUtils
                     .getFileInfoMessage(getActivity(), msg,
@@ -724,8 +724,7 @@ public class ComposeMessageFragment extends Fragment implements
                         }
                     };
                     builder.setPositiveButton(R.string.download, startDL);
-                }
-                else {
+                } else {
                     DialogInterface.OnClickListener stopDL = new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // cancel file download
@@ -738,7 +737,12 @@ public class ComposeMessageFragment extends Fragment implements
                 builder.show();
             }
         }
-    }*/
+    }
+
+    @Override
+    public void onLongItemClick(View view, int position) {
+        //TODO
+    }
 
     private void startDownload(CompositeMessage msg) {
         AttachmentComponent attachment = (AttachmentComponent) msg
@@ -1549,6 +1553,16 @@ public class ComposeMessageFragment extends Fragment implements
             mListAdapter = new MessageListAdapter(getActivity(), null,
                     highlight, null, this);
             mListAdapter.setOnContentChangedListener(mContentChangedListener);
+            mListAdapter.addOnItemClickListener(this);
+            mListAdapter.addOnLongItemClickListener(this);
+            //TODO very preliminary!!
+            mListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onItemRangeInserted(int positionStart, int itemCount) {
+                    super.onItemRangeInserted(positionStart, itemCount);
+                    mLinearLayoutManager.scrollToPosition(mLinearLayoutManager.findLastCompletelyVisibleItemPosition()+1);
+                }
+            });
             mRecyclerView.setAdapter(mListAdapter);
         }
 
