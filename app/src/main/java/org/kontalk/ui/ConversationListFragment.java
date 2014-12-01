@@ -57,6 +57,8 @@ import org.kontalk.util.Preferences;
 
 import android.support.v7.view.ActionMode.Callback;
 
+import com.melnykov.fab.FloatingActionButton;
+
 
 public class ConversationListFragment extends Fragment implements OnItemClickListener, Callback {
     private static final String TAG = ConversationList.TAG;
@@ -68,6 +70,8 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
     private ConversationListAdapter mListAdapter;
     private boolean mDualPane;
     private TextView mTextEmpty;
+
+    private FloatingActionButton mFab;
 
     /** Search menu item. */
     private MenuItem mSearchMenu;
@@ -116,6 +120,14 @@ public class ConversationListFragment extends Fragment implements OnItemClickLis
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mListAdapter);
+        mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        mFab.attachToRecyclerView(mRecyclerView);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseContact();
+            }
+        });
         checkAdapterIsEmpty();
 
         // Check to see if we have a frame in which to embed the details

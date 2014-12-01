@@ -16,7 +16,8 @@
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
  -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -31,6 +32,17 @@
         <!-- Preview: listitem=@layout/conversation_list_item -->
     </android.support.v7.widget.RecyclerView>
 
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_action_mode_delete"
+        app:fab_colorNormal="#000000"
+        app:fab_colorPressed="#000000"
+        app:fab_colorRipple="#000000" />
+
     <TextView android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,4 +51,4 @@
         android:maxLines="20"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-</LinearLayout>
+</FrameLayout>
