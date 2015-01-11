@@ -89,7 +89,7 @@ dependencies {
     compile 'org.igniterealtime.smack:smack-core:4.1.0-alpha6'
     compile 'org.igniterealtime.smack:smack-tcp:4.1.0-alpha6'
     compile 'org.igniterealtime.smack:smack-extensions:4.1.0-alpha6'
-    compile 'com.melnykov:floatingactionbutton:1.0.9'
+    compile 'com.melnykov:floatingactionbutton:1.1.0'
     compile 'com.github.machinarius:preferencefragment:0.1.1'
 
     googleplayCompile 'com.google.android.gms:play-services-base:6.5.87'
