@@ -83,3 +83,4 @@ public class PreferencesActivity extends ActionBarActivity {
         context.startActivityIfNeeded(intent, -1);
     }
 }
+
