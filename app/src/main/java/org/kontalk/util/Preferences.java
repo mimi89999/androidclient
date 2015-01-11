@@ -18,11 +18,6 @@
 
 package org.kontalk.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,11 +37,17 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import org.kontalk.R;
+import org.kontalk.authenticator.Authenticator;
 import org.kontalk.client.EndpointServer;
 import org.kontalk.client.ServerList;
 import org.kontalk.provider.MyMessages.Messages;
 import org.kontalk.service.ServerListUpdater;
 import org.kontalk.service.msgcenter.MessageCenterService;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -143,8 +144,8 @@ public final class Preferences {
             }
         }
 
-        ServerList list = ServerListUpdater.getCurrentList(context);
-        return (list != null) ? list.random() : null;
+        // return server stored in the default account
+        return Authenticator.getDefaultServer(context);
     }
 
     /** Returns a server provider reflecting the current settings. */

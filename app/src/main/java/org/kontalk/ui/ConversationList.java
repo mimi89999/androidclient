@@ -23,6 +23,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,6 +40,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.Toast;
 
+import org.kontalk.Kontalk;
 import org.kontalk.R;
 import org.kontalk.authenticator.Authenticator;
 import org.kontalk.authenticator.LegacyAuthentication;
@@ -73,6 +75,8 @@ public class ConversationList extends ActionBarActivity
 
     private static final String ACTION_AUTH_ERROR_WARNING = "org.kontalk.AUTH_ERROR_WARN";
 
+    private ProgressDialog mTigaseUpgradeWait;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +85,7 @@ public class ConversationList extends ActionBarActivity
         mFragment = (ConversationListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_conversation_list);
 
-        if (!xmppUpgrade())
+        if (!tigaseUpgrade() && !xmppUpgrade())
             handleIntent(getIntent());
     }
 
@@ -91,6 +95,37 @@ public class ConversationList extends ActionBarActivity
 
     public void titleSearch(View view) {
         onSearchRequested();
+    }
+
+    private boolean tigaseUpgrade() {
+        AccountManager am = AccountManager.get(this);
+        Account account = Authenticator.getDefaultAccount(am);
+        if (account != null && Authenticator.getServer(am, account) == null) {
+            mTigaseUpgradeWait = new LockedProgressDialog(this);
+            mTigaseUpgradeWait.setMessage("Please wait...");
+            mTigaseUpgradeWait.show();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    ((Kontalk) getApplication()).waitForTigaseUpgrade();
+                    mTigaseUpgradeWait.dismiss();
+                    mTigaseUpgradeWait = null;
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            NumberValidation.startValidation(ConversationList.this);
+                            finish();
+                        }
+                    });
+                }
+            }).start();
+
+            return true;
+        }
+
+        return false;
     }
 
     /** Big upgrade: asymmetric key encryption (for XMPP). */

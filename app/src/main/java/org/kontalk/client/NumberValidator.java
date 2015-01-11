@@ -184,7 +184,24 @@ public class NumberValidator implements Runnable, ConnectionHelperListener {
 
                 // request number validation via sms
                 mStep = STEP_VALIDATION;
-                initConnection();
+                try {
+                    initConnection();
+                }
+                catch (Exception e) {
+                    EndpointServer server = mServerProvider.next();
+                    if (server != null) {
+                        Log.w(TAG, "connection error - trying next server in list", e);
+                        // run again with new server
+                        mStep = STEP_INIT;
+                        mConnector.setServer(server);
+                        run();
+                        return;
+                    }
+                    else {
+                        // last server to try, no chance for connection
+                        throw e;
+                    }
+                }
 
                 XMPPConnection conn = mConnector.getConnection();
 
@@ -217,8 +234,7 @@ public class NumberValidator implements Runnable, ConnectionHelperListener {
                         else if (iq.getType() == IQ.Type.error) {
                             XMPPError error = iq.getError();
 
-                            if (XMPPError.Condition.service_unavailable.toString()
-                                    .equals(error.getCondition())) {
+                            if (error.getCondition() == XMPPError.Condition.service_unavailable) {
 
                                 if (error.getType() == XMPPError.Type.WAIT) {
                                     reason = ERROR_THROTTLING;
@@ -226,7 +242,7 @@ public class NumberValidator implements Runnable, ConnectionHelperListener {
                                 }
 
                                 else {
-                                    // no registration support - try next the server
+                                    // no registration support - try the next server
 
                                     EndpointServer server = mServerProvider.next();
                                     if (server != null) {
