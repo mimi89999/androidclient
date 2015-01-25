@@ -18,6 +18,17 @@
 
 package org.kontalk.authenticator;
 
+<<<<<<< HEAD
+=======
+import org.jivesoftware.smack.util.StringUtils;
+
+import org.kontalk.Kontalk;
+import org.kontalk.client.EndpointServer;
+import org.kontalk.client.ServerList;
+import org.kontalk.service.ServerListUpdater;
+import org.kontalk.service.msgcenter.MessageCenterService;
+
+>>>>>>> master
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -33,6 +44,8 @@ import org.kontalk.service.msgcenter.MessageCenterService;
 @Deprecated
 public class LegacyAuthentication {
 
+    private static boolean sUpgrading;
+
     // do not instantiate
     private LegacyAuthentication() {}
 
@@ -45,6 +58,8 @@ public class LegacyAuthentication {
         Account account = Authenticator.getDefaultAccount(am);
 
         if (account != null) {
+            // start upgrade process
+            sUpgrading = true;
 
             boolean upgraded = (am.getUserData(account, Authenticator.DATA_AUTHTOKEN) != null);
             if (!upgraded) {
@@ -56,6 +71,18 @@ public class LegacyAuthentication {
 
             // save uid name
             am.setUserData(account, Authenticator.DATA_NAME, name);
+
+            // set server to first in built-in server list
+            ServerList list = ServerListUpdater.getCurrentList(context);
+            EndpointServer server = list.get(0);
+            am.setUserData(account, Authenticator.DATA_SERVER_URI, server.toString());
+
+            // setup a new passphrase for the upgrade
+            String passphrase = StringUtils.randomString(40);
+            am.setPassword(account, passphrase);
+
+            // invalidate personal key and passphrase
+            ((Kontalk) context.getApplicationContext()).invalidatePersonalKey();
 
             // start key pair generation
             MessageCenterService.regenerateKeyPair(context);
@@ -74,6 +101,14 @@ public class LegacyAuthentication {
             return am.getUserData(account, Authenticator.DATA_AUTHTOKEN);
 
         return null;
+    }
+
+    public static boolean isUpgrading() {
+        return sUpgrading;
+    }
+
+    public static void endUpgrade() {
+        sUpgrading = false;
     }
 
 }

@@ -70,7 +70,7 @@ public class PersonalKey implements Parcelable {
     /** Decrypted key pair (for direct usage). */
     private final PGPDecryptedKeyPairRing mPair;
     /** X.509 bridge certificate. */
-    private X509Certificate mBridgeCert;
+    private final X509Certificate mBridgeCert;
 
     private PersonalKey(PGPDecryptedKeyPairRing keyPair, X509Certificate bridgeCert) {
         mPair = keyPair;
@@ -83,6 +83,7 @@ public class PersonalKey implements Parcelable {
 
     private PersonalKey(Parcel in) throws PGPException, IOException {
         mPair = PGP.fromParcel(in);
+        mBridgeCert = null;
         // TODO mBridgeCert = X509Bridge.fromParcel(in);
     }
 
@@ -123,10 +124,7 @@ public class PersonalKey implements Parcelable {
     }
 
     public PGPKeyPairRing storeNetwork(String userId, String network, String name, String passphrase) throws PGPException {
-        // FIXME dummy values
-        return store(name,
-            userId + '@' + network, "NO COMMENT",
-            passphrase);
+        return store(name, userId + '@' + network, null, passphrase);
     }
 
     public PGPKeyPairRing store(String name, String email, String comment, String passphrase) throws PGPException {
@@ -143,7 +141,9 @@ public class PersonalKey implements Parcelable {
             userid.append(email);
         userid.append('>');
 
-        return PGP.store(mPair, userid.toString(), passphrase);
+        PGPKeyPairRing kp = PGP.store(mPair, userid.toString(), passphrase);
+
+        return kp;
     }
 
     /**
@@ -155,6 +155,10 @@ public class PersonalKey implements Parcelable {
         // FIXME should loop through the ring and check for master/subkey
         mPair.signKey = new PGPKeyPair(ring.getPublicKey(), mPair.signKey.getPrivateKey());
         return ring;
+    }
+
+    public PersonalKey copy(X509Certificate bridgeCert) {
+        return new PersonalKey(mPair, bridgeCert);
     }
 
     /** Checks that the given personal key data is correct. */

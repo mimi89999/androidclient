@@ -31,7 +31,6 @@ import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jxmpp.util.XmppStringUtils;
 import org.spongycastle.openpgp.PGPPublicKey;
@@ -126,6 +125,7 @@ import org.kontalk.util.XMPPUtils;
 import static android.content.res.Configuration.KEYBOARDHIDDEN_NO;
 import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_ACCEPT;
 import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_BLOCK;
+import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_REJECT;
 import static org.kontalk.service.msgcenter.MessageCenterService.PRIVACY_UNBLOCK;
 
 
@@ -535,7 +535,7 @@ public class ComposeMessageFragment extends ListFragment implements
                 */
                 byte[] bytes = mText.getBytes();
 
-                String msgId = StringUtils.randomString(30);
+                String msgId = MessageUtils.messageId();
 
                 // save to local storage
                 ContentValues values = new ContentValues();
@@ -794,7 +794,8 @@ public class ComposeMessageFragment extends ListFragment implements
 	        attachmentMenu = new IconContextMenu(getActivity(), CONTEXT_MENU_ATTACHMENT);
 	        attachmentMenu.addItem(getResources(), R.string.attachment_picture, R.drawable.ic_launcher_gallery, ATTACHMENT_ACTION_PICTURE);
 	        attachmentMenu.addItem(getResources(), R.string.attachment_contact, R.drawable.ic_launcher_contacts, ATTACHMENT_ACTION_CONTACT);
-	        attachmentMenu.addItem(getResources(), R.string.attachment_audio, R.drawable.ic_launcher_audio, ATTACHMENT_ACTION_AUDIO);
+            if (AudioDialog.isSupported(getActivity()))
+	            attachmentMenu.addItem(getResources(), R.string.attachment_audio, R.drawable.ic_launcher_audio, ATTACHMENT_ACTION_AUDIO);
 	        attachmentMenu.setOnClickListener(this);
 	    }
 	    attachmentMenu.createMenu(getString(R.string.menu_attachment)).show();
@@ -1600,7 +1601,7 @@ public class ComposeMessageFragment extends ListFragment implements
                         if (v.getId() == R.id.button_accept)
                             action = PRIVACY_ACCEPT;
                         else
-                            action = PRIVACY_BLOCK;
+                            action = PRIVACY_REJECT;
 
                         setPrivacy(action);
                     }
@@ -1638,6 +1639,7 @@ public class ComposeMessageFragment extends ListFragment implements
                 break;
 
             case PRIVACY_BLOCK:
+            case PRIVACY_REJECT:
                 status = Threads.REQUEST_REPLY_PENDING_BLOCK;
                 break;
 
@@ -1662,7 +1664,7 @@ public class ComposeMessageFragment extends ListFragment implements
                 new String[] { mUserJID });
 
         // setup broadcast receiver for block/unblock reply
-        if (action == PRIVACY_BLOCK || action == PRIVACY_UNBLOCK) {
+        if (action == PRIVACY_REJECT || action == PRIVACY_BLOCK || action == PRIVACY_UNBLOCK) {
             if (mPrivacyListener == null) {
                 mPrivacyListener = new BroadcastReceiver() {
                     public void onReceive(Context context, Intent intent) {
