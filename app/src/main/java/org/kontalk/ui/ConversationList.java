@@ -18,23 +18,6 @@
 
 package org.kontalk.ui;
 
-<<<<<<< HEAD
-=======
-import org.kontalk.BuildConfig;
-import org.kontalk.R;
-import org.kontalk.authenticator.Authenticator;
-import org.kontalk.authenticator.LegacyAuthentication;
-import org.kontalk.data.Contact;
-import org.kontalk.data.Conversation;
-import org.kontalk.provider.MessagesProvider;
-import org.kontalk.provider.MyMessages.Threads;
-import org.kontalk.service.msgcenter.MessageCenterService;
-import org.kontalk.sync.Syncer;
-import org.kontalk.util.MessageUtils;
-import org.kontalk.util.Preferences;
-import org.kontalk.util.XMPPUtils;
-
->>>>>>> master
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -57,7 +40,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.Toast;
 
-import org.kontalk.Kontalk;
+import org.kontalk.BuildConfig;
 import org.kontalk.R;
 import org.kontalk.authenticator.Authenticator;
 import org.kontalk.authenticator.LegacyAuthentication;

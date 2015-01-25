@@ -18,23 +18,6 @@
 
 package org.kontalk.ui;
 
-<<<<<<< HEAD
-=======
-import com.rockerhieu.emojicon.EmojiconEditText;
-import com.rockerhieu.emojicon.EmojiconTextView;
-import com.rockerhieu.emojicon.EmojiconsFragment;
-import com.rockerhieu.emojicon.emoji.Emojicon;
-
-import org.kontalk.BuildConfig;
-import org.kontalk.R;
-import org.kontalk.data.Contact;
-import org.kontalk.data.Conversation;
-import org.kontalk.message.CompositeMessage;
-import org.kontalk.provider.MyMessages.Messages;
-import org.kontalk.provider.MyMessages.Threads;
-import org.kontalk.util.MessageUtils;
-
->>>>>>> master
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Spannable;
@@ -47,6 +30,7 @@ import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.kontalk.BuildConfig;
 import org.kontalk.R;
 import org.kontalk.data.Contact;
 import org.kontalk.data.Conversation;

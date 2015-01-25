@@ -18,23 +18,7 @@
 
 package org.kontalk.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
-<<<<<<< HEAD
-=======
-import org.jivesoftware.smack.util.StringUtils;
-import org.kontalk.R;
-import org.kontalk.authenticator.Authenticator;
-import org.kontalk.data.Contact;
-import org.kontalk.message.CompositeMessage;
-import org.kontalk.provider.MyMessages.CommonColumns;
-import org.kontalk.provider.MyMessages.Messages;
-import org.kontalk.provider.MyMessages.Threads;
-import org.kontalk.util.Preferences;
-
 import android.accounts.Account;
->>>>>>> master
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -64,6 +48,9 @@ import org.kontalk.provider.MyMessages.CommonColumns;
 import org.kontalk.provider.MyMessages.Messages;
 import org.kontalk.provider.MyMessages.Threads;
 import org.kontalk.util.Preferences;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

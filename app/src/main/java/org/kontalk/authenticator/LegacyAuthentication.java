@@ -18,21 +18,15 @@
 
 package org.kontalk.authenticator;
 
-<<<<<<< HEAD
-=======
-import org.jivesoftware.smack.util.StringUtils;
-
-import org.kontalk.Kontalk;
-import org.kontalk.client.EndpointServer;
-import org.kontalk.client.ServerList;
-import org.kontalk.service.ServerListUpdater;
-import org.kontalk.service.msgcenter.MessageCenterService;
-
->>>>>>> master
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 
+import org.jivesoftware.smack.util.StringUtils;
+import org.kontalk.Kontalk;
+import org.kontalk.client.EndpointServer;
+import org.kontalk.client.ServerList;
+import org.kontalk.service.ServerListUpdater;
 import org.kontalk.service.msgcenter.MessageCenterService;
 
 

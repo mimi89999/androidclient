@@ -18,12 +18,6 @@
 
 package org.kontalk.ui;
 
-<<<<<<< HEAD
-=======
-import org.kontalk.R;
-import org.kontalk.util.SystemUtils;
-
->>>>>>> master
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -38,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.kontalk.R;
+import org.kontalk.util.SystemUtils;
 
 
 /**

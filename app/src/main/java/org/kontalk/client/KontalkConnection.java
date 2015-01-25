@@ -30,8 +30,10 @@ import org.jivesoftware.smack.debugger.SmackDebuggerFactory;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.debugger.android.AndroidDebugger;
+import org.jivesoftware.smackx.iqversion.VersionManager;
 import org.kontalk.BuildConfig;
 import org.kontalk.Kontalk;
+import org.kontalk.authenticator.LegacyAuthentication;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -52,27 +54,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-<<<<<<< HEAD
-=======
-import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
-import org.jivesoftware.smack.SASLAuthentication;
-import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.debugger.SmackDebugger;
-import org.jivesoftware.smack.debugger.SmackDebuggerFactory;
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.debugger.android.AndroidDebugger;
-import org.jivesoftware.smackx.iqversion.VersionManager;
-
-import android.util.Log;
-
-import org.kontalk.BuildConfig;
-import org.kontalk.Kontalk;
-import org.kontalk.authenticator.LegacyAuthentication;
-
->>>>>>> master
 
 public class KontalkConnection extends XMPPTCPConnection {
     private static final String TAG = Kontalk.TAG;
