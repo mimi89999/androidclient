@@ -100,7 +100,8 @@ public class KontalkConnection extends XMPPTCPConnection {
             // for EXTERNAL
             .allowEmptyOrNullUsernames()
             // enable compression
-            .setCompressionEnabled(true)
+            // FIXME workaround for maybeCompressFeaturesReceived Smack bug
+            .setCompressionEnabled(!secure)
             // enable encryption
             .setSecurityMode(secure ? SecurityMode.disabled : SecurityMode.required)
             // we will send a custom presence

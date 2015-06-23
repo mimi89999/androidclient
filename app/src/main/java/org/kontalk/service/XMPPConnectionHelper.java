@@ -63,7 +63,7 @@ public class XMPPConnectionHelper extends Thread {
     private static final String TAG = MessageCenterService.TAG;
 
     /** Whether to use STARTTLS or direct SSL connection. */
-    private static final boolean USE_STARTTLS = true;
+    private static final boolean USE_STARTTLS = false;
 
     /** Max connection retry count if idle. */
     private static final int MAX_IDLE_BACKOFF = 10;
