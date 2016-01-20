@@ -21,16 +21,21 @@ package org.kontalk.sync;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jxmpp.util.XmppStringUtils;
 import org.spongycastle.openpgp.PGPPublicKey;
 
 import android.accounts.Account;
 import android.accounts.OperationCanceledException;
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
@@ -41,6 +46,7 @@ import android.content.IntentFilter;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Process;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
@@ -97,10 +103,15 @@ public class Syncer {
     private final static class PresenceItem {
         public String from;
         public String status;
+        public String rosterName;
         public long timestamp;
         public byte[] publicKey;
         public boolean blocked;
         public boolean presence;
+        /** True if found during roster match. */
+        public boolean matched;
+        /** Discard this entry: it has not been found on server. */
+        public boolean discarded;
     }
 
     // FIXME this class should handle most recent/available presence stanzas
@@ -119,6 +130,8 @@ public class Syncer {
         private int presenceCount;
         private int pubkeyCount;
         private int rosterCount;
+        /** Packet id list for not matched contacts (in roster but not matched on server). */
+        private Set<String> notMatched = new HashSet<>();
         private boolean blocklistReceived;
 
         public PresenceBroadcastReceiver(List<String> jidList, Syncer notifyTo) {
@@ -144,10 +157,19 @@ public class Syncer {
                         PresenceItem item = getPresenceItem(bareJid);
                         item.status = intent.getStringExtra(MessageCenterService.EXTRA_STATUS);
                         item.timestamp = intent.getLongExtra(MessageCenterService.EXTRA_STAMP, -1);
+                        item.rosterName = intent.getStringExtra(MessageCenterService.EXTRA_ROSTER_NAME);
                         if (!item.presence) {
                             item.presence = true;
                             // increment presence count
                             presenceCount++;
+                            // check user existance (only if subscription is "both")
+                            if (!item.matched && intent.getBooleanExtra(MessageCenterService.EXTRA_SUBSCRIBED_FROM, false) &&
+                                intent.getBooleanExtra(MessageCenterService.EXTRA_SUBSCRIBED_TO, false)) {
+                                // verify actual user existance through last activity
+                                String lastActivityId = StringUtils.randomString(6);
+                                MessageCenterService.requestLastActivity(context, item.from, lastActivityId);
+                                notMatched.add(lastActivityId);
+                            }
                         }
                     }
                 }
@@ -171,6 +193,7 @@ public class Syncer {
                             for (String jid : list) {
                                 PresenceItem p = new PresenceItem();
                                 p.from = jid;
+                                p.matched = true;
                                 response.add(p);
                             }
                         }
@@ -218,7 +241,7 @@ public class Syncer {
                     }
 
                     // done with presence data and blocklist
-                    if (pubkeyCount == presenceCount && blocklistReceived)
+                    if (pubkeyCount == presenceCount && blocklistReceived && notMatched.size() == 0)
                         finish();
 
                 }
@@ -246,8 +269,32 @@ public class Syncer {
                 }
 
                 // done with presence data and blocklist
-                if (pubkeyCount >= presenceCount)
+                if (pubkeyCount >= presenceCount && notMatched.size() == 0)
                     finish();
+            }
+
+            // last activity (for user existance verification)
+            else if (MessageCenterService.ACTION_LAST_ACTIVITY.equals(action)) {
+                String requestId = intent.getStringExtra(MessageCenterService.EXTRA_PACKET_ID);
+                if (notMatched.contains(requestId)) {
+                    notMatched.remove(requestId);
+
+                    String type = intent.getStringExtra(MessageCenterService.EXTRA_TYPE);
+                    // consider only item-not-found (404) errors
+                    if (type != null && type.equalsIgnoreCase(IQ.Type.error.toString()) &&
+                            XMPPError.Condition.item_not_found.toString().equals(intent
+                                .getStringExtra(MessageCenterService.EXTRA_ERROR_CONDITION))) {
+                        // user does not exist!
+                        String jid = intent.getStringExtra(MessageCenterService.EXTRA_FROM);
+                        // discard entry
+                        discardPresenceItem(jid);
+                        // unsubscribe!
+                        unsubscribe(context, jid);
+
+                        if (pubkeyCount >= presenceCount && blocklistReceived && notMatched.size() == 0)
+                            finish();
+                    }
+                }
             }
 
             // connected! Retry...
@@ -270,6 +317,15 @@ public class Syncer {
             }
         }
 
+        private void discardPresenceItem(String jid) {
+            for (PresenceItem item : response) {
+                if (XmppStringUtils.parseBareJid(item.from).equalsIgnoreCase(jid)) {
+                    item.discarded = true;
+                    return;
+                }
+            }
+        }
+
         private PresenceItem getPresenceItem(String jid) {
             for (PresenceItem item : response) {
                 if (XmppStringUtils.parseBareJid(item.from).equalsIgnoreCase(jid))
@@ -281,6 +337,14 @@ public class Syncer {
             item.from = jid;
             response.add(item);
             return item;
+        }
+
+        private void unsubscribe(Context context, String jid) {
+            Intent i = new Intent(context, MessageCenterService.class);
+            i.setAction(MessageCenterService.ACTION_PRESENCE);
+            i.putExtra(MessageCenterService.EXTRA_TO, jid);
+            i.putExtra(MessageCenterService.EXTRA_TYPE, Presence.Type.unsubscribe.name());
+            context.startService(i);
         }
 
         private int getRosterParts(List<String> jidList) {
@@ -352,7 +416,7 @@ public class Syncer {
             int count = usersProvider.update(uri, new ContentValues(), null, null);
             Log.d(TAG, "users database resynced (" + count + ")");
         }
-        catch (RemoteException e) {
+        catch (Exception e) {
             Log.e(TAG, "error resyncing users database - aborting sync", e);
             syncResult.databaseError = true;
             return;
@@ -365,7 +429,7 @@ public class Syncer {
                 new String[] { Users.JID, Users.NUMBER, Users.LOOKUP_KEY },
                 null, null, null);
         }
-        catch (RemoteException e) {
+        catch (Exception e) {
             Log.e(TAG, "error querying users database - aborting sync", e);
             syncResult.databaseError = true;
             return;
@@ -414,6 +478,15 @@ public class Syncer {
                 Log.e(TAG, "contact delete error", e);
                 syncResult.databaseError = true;
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                try {
+                    syncResult.stats.numDeletes += deleteProfile(account, provider);
+                }
+                catch (Exception e) {
+                    Log.e(TAG, "profile delete error", e);
+                    syncResult.databaseError = true;
+                }
+            }
 
             commit(usersProvider, syncResult);
         }
@@ -429,6 +502,7 @@ public class Syncer {
             f.addAction(MessageCenterService.ACTION_ROSTER_MATCH);
             f.addAction(MessageCenterService.ACTION_PUBLICKEY);
             f.addAction(MessageCenterService.ACTION_BLOCKLIST);
+            f.addAction(MessageCenterService.ACTION_LAST_ACTIVITY);
             f.addAction(MessageCenterService.ACTION_CONNECTED);
             lbm.registerReceiver(receiver, f);
 
@@ -469,20 +543,30 @@ public class Syncer {
                     syncResult.databaseError = true;
                     return;
                 }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                    try {
+                        syncResult.stats.numDeletes += deleteProfile(account, provider);
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, "profile delete error", e);
+                        syncResult.databaseError = true;
+                    }
+                }
 
                 ContentValues registeredValues = new ContentValues();
                 registeredValues.put(Users.REGISTERED, 1);
                 for (int i = 0; i < res.size(); i++) {
                     PresenceItem entry = res.get(i);
+                    if (entry.discarded)
+                        continue;
 
                     final RawPhoneNumberEntry data = lookupNumbers
                         .get(XmppStringUtils.parseLocalpart(entry.from));
-                    if (data != null) {
+                    if (data != null && data.lookupKey != null) {
                         // add contact
                         addContact(account,
                                 getDisplayName(provider, data.lookupKey, data.number),
-                                data.number, data.jid, operations, op);
-                        op++;
+                                data.number, data.jid, operations, op++);
                     }
                     else {
                         syncResult.stats.numSkippedEntries++;
@@ -526,6 +610,10 @@ public class Syncer {
                         else {
                             registeredValues.putNull(Users.FINGERPRINT);
                             registeredValues.putNull(Users.PUBLIC_KEY);
+                            // use roster name if no contact data available
+                            if (data == null && entry.rosterName != null) {
+                                registeredValues.put(Users.DISPLAY_NAME, entry.rosterName);
+                            }
                         }
 
                         // blocked status
@@ -553,10 +641,19 @@ public class Syncer {
                         registeredValues.remove(Users.DISPLAY_NAME);
 
                         // if this is our own contact, trust our own key later
-                        if (Authenticator.isSelfJID(mContext, entry.from))
+                        if (Authenticator.isSelfJID(mContext, entry.from)) {
                             ownContactJid = entry.from;
+
+                            // register our profile while we're at it
+                            if (data != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                                // add contact
+                                addProfile(account,
+                                    Authenticator.getDefaultDisplayName(mContext),
+                                    data.number, data.jid, operations, op++);
+                            }
+                        }
                     }
-                    catch (RemoteException e) {
+                    catch (Exception e) {
                         Log.e(TAG, "error updating users database", e);
                         // we shall continue here...
                     }
@@ -602,7 +699,7 @@ public class Syncer {
             Log.d(TAG, "users database committed");
             Contact.invalidate();
         }
-        catch (RemoteException e) {
+        catch (Exception e) {
             Log.e(TAG, "error committing users database - aborting sync", e);
             syncResult.databaseError = true;
         }
@@ -672,6 +769,16 @@ public class Syncer {
             .build(), null, null);
     }
 
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private int deleteProfile(Account account, ContentProviderClient provider)
+            throws RemoteException {
+        return provider.delete(ContactsContract.Profile.CONTENT_RAW_CONTACTS_URI.buildUpon()
+            .appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true")
+            .appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
+            .appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
+            .build(), null, null);
+    }
+
     /*
     private int deleteContact(Account account, long rawContactId) {
         Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId)
@@ -701,18 +808,42 @@ public class Syncer {
             Log.d(TAG, "adding contact \"" + username + "\" <" + phone + ">");
         }
 
-        ContentProviderOperation.Builder builder;
-        final int opIndex = index * 3;
+        // create our RawContact
+        operations.add(insertRawContact(account, username, phone, jid,
+            RawContacts.CONTENT_URI).build());
+
+        // add contact data
+        addContactData(username, phone, operations, index);
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private void addProfile(Account account, String username, String phone, String jid,
+            List<ContentProviderOperation> operations, int index) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "adding profile \"" + username + "\" <" + phone + ">");
+        }
 
         // create our RawContact
-        builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
+        operations.add(insertRawContact(account, username, phone, jid,
+            ContactsContract.Profile.CONTENT_RAW_CONTACTS_URI).build());
+
+        // add contact data
+        addContactData(username, phone, operations, index);
+    }
+
+    private ContentProviderOperation.Builder insertRawContact(Account account, String username, String phone, String jid, Uri uri) {
+        return ContentProviderOperation.newInsert(uri)
             .withValue(RawContacts.AGGREGATION_MODE, RawContacts.AGGREGATION_MODE_DEFAULT)
             .withValue(RawContacts.ACCOUNT_NAME, account.name)
             .withValue(RawContacts.ACCOUNT_TYPE, account.type)
             .withValue(RAW_COLUMN_DISPLAY_NAME, username)
             .withValue(RAW_COLUMN_PHONE, phone)
             .withValue(RAW_COLUMN_USERID, jid);
-        operations.add(builder.build());
+    }
+
+    private void addContactData(String username, String phone, List<ContentProviderOperation> operations, int index) {
+        ContentProviderOperation.Builder builder;
+        final int opIndex = index * 3;
 
         // create a Data record of common type 'StructuredName' for our RawContact
         builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)

@@ -19,11 +19,11 @@
 package org.kontalk.ui;
 
 import org.kontalk.R;
+import org.kontalk.service.msgcenter.MessageCenterService;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 
@@ -32,14 +32,14 @@ import android.view.MenuItem;
  * TODO use popup activity on tablet
  * @author Daniele Ricci
  */
-public class StatusActivity extends ActionBarActivity {
+public class StatusActivity extends ToolbarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.status_screen);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar(true);
     }
 
     public static void start(Activity context) {
@@ -48,11 +48,25 @@ public class StatusActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // hold message center
+        MessageCenterService.hold(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // release message center
+        MessageCenterService.release(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                startActivity(new Intent(this, ConversationList.class));
+                startActivity(new Intent(this, ConversationsActivity.class));
                 return true;
 
             default:

@@ -18,14 +18,17 @@
 
 package org.kontalk.ui;
 
-
 import java.io.IOException;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+
+import org.kontalk.util.SystemUtils;
+
 
 /**
  * A fragment that handles media recorder and player instances, independently
@@ -38,6 +41,9 @@ public class AudioFragment extends Fragment {
     private MediaPlayer mPlayer;
 
     private long mStartTime;
+
+    /** Message id of the media currently being played. */
+    private long mMessageId = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +71,7 @@ public class AudioFragment extends Fragment {
         MediaRecorder recorder = getRecorder();
         recorder.prepare();
         recorder.start();
+        acquireLock();
     }
 
     public long getElapsedTime() {
@@ -72,6 +79,8 @@ public class AudioFragment extends Fragment {
     }
 
     public void stopRecording() {
+        // release lock anyway
+        releaseLock();
         if (mRecorder != null) {
             mRecorder.stop();
             mRecorder.reset();
@@ -85,13 +94,64 @@ public class AudioFragment extends Fragment {
         if (mPlayer != null) {
             mStartTime = SystemClock.uptimeMillis();
             mPlayer.start();
+            // started, acquire lock
+            acquireLock();
         }
+    }
+
+    public void pausePlaying() {
+        if (mPlayer != null) {
+            mPlayer.pause();
+            // paused, release lock
+            releaseLock();
+        }
+    }
+
+    public void seekPlayerTo(int msec) {
+        if (mPlayer != null)
+            mPlayer.seekTo(msec);
+    }
+
+    public void resetPlayer() {
+        if (mPlayer != null)
+            mPlayer.reset();
+    }
+
+    public boolean isPlaying() {
+        return mPlayer != null && mPlayer.isPlaying();
+    }
+
+    public void setMessageId(long mMessageId) {
+        this.mMessageId = mMessageId;
+    }
+
+    public long getMessageId() {
+        return mMessageId;
+    }
+
+    public void finish(boolean release) {
+        if (mPlayer != null && release)
+            mPlayer.release();
+        finish();
     }
 
     public void finish() {
         mPlayer = null;
         mRecorder = null;
         mStartTime = 0;
+        releaseLock();
+    }
+
+    private void acquireLock() {
+        Activity a = getActivity();
+        if (a != null)
+            SystemUtils.acquireScreenOn(a);
+    }
+
+    private void releaseLock() {
+        Activity a = getActivity();
+        if (a != null)
+            SystemUtils.releaseScreenOn(a);
     }
 
 }

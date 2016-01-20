@@ -18,6 +18,15 @@
 
 package org.kontalk;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+
+import org.spongycastle.openpgp.PGPException;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
@@ -26,6 +35,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -33,6 +43,7 @@ import org.kontalk.authenticator.Authenticator;
 import org.kontalk.crypto.PGP;
 import org.kontalk.crypto.PRNGFixes;
 import org.kontalk.crypto.PersonalKey;
+import org.kontalk.data.Contact;
 import org.kontalk.provider.MessagesProvider;
 import org.kontalk.service.DownloadService;
 import org.kontalk.service.NetworkStateReceiver;
@@ -46,15 +57,8 @@ import org.kontalk.sync.SyncAdapter;
 import org.kontalk.ui.ComposeMessage;
 import org.kontalk.ui.MessagingNotification;
 import org.kontalk.ui.SearchActivity;
+import org.kontalk.util.MediaStorage;
 import org.kontalk.util.Preferences;
-
-import org.spongycastle.openpgp.PGPException;
-
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
 
 
 /**
@@ -64,7 +68,14 @@ import java.security.cert.CertificateException;
 public class Kontalk extends Application {
     public static final String TAG = Kontalk.class.getSimpleName();
 
-    private SharedPreferences.OnSharedPreferenceChangeListener mPrefListener;
+    // @deprecated
+    static {
+        try {
+            Class.forName(MediaStorage.class.getName());
+        }
+        catch (ClassNotFoundException ignored) {
+        }
+    }
 
     private PersonalKey mDefaultKey;
 
@@ -82,7 +93,7 @@ public class Kontalk extends Application {
      * Keep-alive reference counter.
      * This is used throughout the activities to keep track of application
      * usage. Please note that this is not to be confused with
-     * {@link MessageCenterService#IdleConnectionHandler} reference counter,
+     * {@link MessageCenterService.IdleConnectionHandler} reference counter,
      * since this counter here is used only by {@link NetworkStateReceiver} and
      * a few others to check if the Message Center should be started or not.<br>
      * Call {@link #hold} to increment the counter, {@link #release} to
@@ -103,11 +114,15 @@ public class Kontalk extends Application {
         // init preferences
         Preferences.init(this);
 
+        // init contacts
+        Contact.init(this, new Handler());
+
         // init notification system
         MessagingNotification.init(this);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mPrefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        final SharedPreferences.OnSharedPreferenceChangeListener prefListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 // no account - abort
@@ -136,7 +151,7 @@ public class Kontalk extends Application {
                 }
             }
         };
-        prefs.registerOnSharedPreferenceChangeListener(mPrefListener);
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
         // TODO listen for changes to phone numbers
 
@@ -212,11 +227,11 @@ public class Kontalk extends Application {
         return mDefaultKey;
     }
 
-    public void exportPersonalKey(String exportPassphrase)
+    public void exportPersonalKey(OutputStream out, String exportPassphrase)
             throws CertificateException, PGPException, IOException,
                 NoSuchProviderException, KeyStoreException, NoSuchAlgorithmException {
 
-        Authenticator.exportDefaultPersonalKey(this, getCachedPassphrase(), exportPassphrase, true);
+        Authenticator.exportDefaultPersonalKey(this, out, getCachedPassphrase(), exportPassphrase, true);
     }
 
     /** Invalidates the cached personal key. */

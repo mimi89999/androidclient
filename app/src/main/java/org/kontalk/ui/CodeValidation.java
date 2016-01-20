@@ -18,7 +18,11 @@
 
 package org.kontalk.ui;
 
+import com.afollestad.materialdialogs.AlertDialogWrapper;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +32,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,10 +41,13 @@ import org.kontalk.client.EndpointServer;
 import org.kontalk.client.NumberValidator;
 import org.kontalk.client.NumberValidator.NumberValidatorListener;
 import org.kontalk.crypto.PersonalKey;
+import org.kontalk.provider.UsersProvider;
 import org.kontalk.service.KeyPairGeneratorService;
 import org.kontalk.util.Preferences;
 
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /** Manual validation code input. */
@@ -49,18 +57,24 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
 
     private EditText mCode;
     private Button mButton;
+    private Button mFallbackButton;
+    private ProgressBar mProgress;
+
     private NumberValidator mValidator;
     private PersonalKey mKey;
     private String mName;
     private String mPhone;
     private String mPassphrase;
+    private boolean mForce;
     private EndpointServer.EndpointServerProvider mServerProvider;
 
     private byte[] mImportedPrivateKey;
     private byte[] mImportedPublicKey;
+    private Map<String, String> mTrustedKeys;
 
     private static final class RetainData {
         NumberValidator validator;
+        Map<String, String> trustedKeys;
     }
 
     @Override
@@ -69,14 +83,12 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
 
         supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.code_validation_screen);
-
-        //setSupportProgressBarIndeterminate(true);
-        // HACK this is for crappy honeycomb :)
-        setSupportProgressBarIndeterminateVisibility(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar(true);
 
         mCode = (EditText) findViewById(R.id.validation_code);
         mButton = (Button) findViewById(R.id.send_button);
+        mFallbackButton = (Button) findViewById(R.id.fallback_button);
+        mProgress = (ProgressBar) findViewById(R.id.progressbar);
 
         // configuration change??
         RetainData data = (RetainData) getLastCustomNonConfigurationInstance();
@@ -86,6 +98,7 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
                 startProgress();
                 mValidator.setListener(this);
             }
+            mTrustedKeys = data.trustedKeys;
         }
 
         int requestCode = getIntent().getIntExtra("requestCode", -1);
@@ -102,15 +115,33 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
             String sender = getIntent().getStringExtra("sender");
             ((TextView) findViewById(R.id.code_validation_sender))
                 .setText(sender);
+
+            CharSequence textId1, textId2;
+            if (NumberValidator.isMissedCall(sender)) {
+                textId1 = getText(R.string.code_validation_intro_missed_call);
+                textId2 = getString(R.string.code_validation_intro2_missed_call,
+                    NumberValidator.getChallengeLength(sender));
+                findViewById(R.id.fallback_button).setVisibility(View.VISIBLE);
+            }
+            else {
+                textId1 = getText(R.string.code_validation_intro);
+                textId2 = getText(R.string.code_validation_intro2);
+                findViewById(R.id.fallback_button).setVisibility(View.GONE);
+            }
+
+            ((TextView) findViewById(R.id.code_validation_intro)).setText(textId1);
+            ((TextView) findViewById(R.id.code_validation_intro2)).setText(textId2);
         }
 
         Intent i = getIntent();
         mKey = i.getParcelableExtra(KeyPairGeneratorService.EXTRA_KEY);
         mName = i.getStringExtra("name");
         mPhone = i.getStringExtra("phone");
+        mForce = i.getBooleanExtra("force", false);
         mPassphrase = i.getStringExtra("passphrase");
         mImportedPrivateKey = i.getByteArrayExtra("importedPrivateKey");
         mImportedPublicKey = i.getByteArrayExtra("importedPublicKey");
+        mTrustedKeys = (HashMap) i.getSerializableExtra("trustedKeys");
 
         String server = i.getStringExtra("server");
         if (server != null)
@@ -138,9 +169,21 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
 
     @Override
     public void onBackPressed() {
-        // we are going back voluntarily
-        Preferences.clearRegistrationProgress(this);
-        super.onBackPressed();
+        new MaterialDialog.Builder(this)
+            .title(R.string.title_confirm_cancel_registration)
+            .content(R.string.confirm_cancel_registration)
+            .positiveText(android.R.string.ok)
+            .positiveColorRes(R.color.button_danger)
+            .negativeText(android.R.string.cancel)
+            .callback(new MaterialDialog.ButtonCallback() {
+                @Override
+                public void onPositive(MaterialDialog dialog) {
+                    // we are going back voluntarily
+                    Preferences.clearRegistrationProgress(CodeValidation.this);
+                    CodeValidation.super.onBackPressed();
+                }
+            })
+            .show();
     }
 
     /** No search here. */
@@ -154,7 +197,15 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
     public Object onRetainCustomNonConfigurationInstance() {
         RetainData data = new RetainData();
         data.validator = mValidator;
+        data.trustedKeys = mTrustedKeys;
         return data;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // start a users resync in the meantime
+        UsersProvider.resync(this);
     }
 
     @Override
@@ -171,18 +222,35 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    private void error(int title, int message) {
-        new AlertDialog.Builder(this)
-            .setTitle(title)
+    private void error(int message) {
+        new AlertDialogWrapper.Builder(this)
             .setMessage(message)
             .setNeutralButton(android.R.string.ok, null)
+            .show();
+    }
+
+    public void doFallback(View view) {
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.title_fallback)
+            .setMessage(R.string.msg_fallback)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent i = new Intent();
+                    i.putExtra("force", mForce);
+                    setResult(NumberValidation.RESULT_FALLBACK, i);
+                    finish();
+                }
+            })
+            .setNegativeButton(android.R.string.cancel, null)
             .show();
     }
 
     public void validateCode(View view) {
         String code = mCode.getText().toString().trim();
         if (code.length() == 0) {
-            error(R.string.title_invalid_code, R.string.msg_invalid_code);
+            error(R.string.msg_invalid_code);
             return;
         }
 
@@ -203,18 +271,19 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
 
     private void enableControls(boolean enabled) {
         mButton.setEnabled(enabled);
+        mFallbackButton.setEnabled(enabled);
         mCode.setEnabled(enabled);
     }
 
     private void startProgress() {
-        setSupportProgressBarIndeterminateVisibility(true);
+        mProgress.setVisibility(View.VISIBLE);
         enableControls(false);
         keepScreenOn(true);
     }
 
     private void abort(boolean ending) {
         if (!ending) {
-            setSupportProgressBarIndeterminateVisibility(false);
+            mProgress.setVisibility(View.GONE);
             enableControls(true);
         }
         else {
@@ -276,6 +345,7 @@ public class CodeValidation extends AccountAuthenticatorActionBarActivity
                 i.putExtra(NumberValidation.PARAM_SERVER_URI, v.getServer().toString());
                 i.putExtra(NumberValidation.PARAM_PUBLICKEY, publicKeyData);
                 i.putExtra(NumberValidation.PARAM_PRIVATEKEY, privateKeyData);
+                i.putExtra(NumberValidation.PARAM_TRUSTED_KEYS, (HashMap) mTrustedKeys);
                 setResult(RESULT_OK, i);
                 finish();
             }

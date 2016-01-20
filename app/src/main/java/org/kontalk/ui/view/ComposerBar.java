@@ -92,6 +92,8 @@ public class ComposerBar extends RelativeLayout implements
     private ComposerListener mListener;
     private TextWatcher mChatStateListener;
 
+    boolean mEnterSend;
+
     /** Used during audio recording to restore focus status of the text entry. */
     private boolean mTextEntryFocus;
     private boolean mComposeSent;
@@ -167,6 +169,7 @@ public class ComposerBar extends RelativeLayout implements
                 InputType.TYPE_TEXT_VARIATION_LONG_MESSAGE;
             mTextEntry.setImeOptions(EditorInfo.IME_ACTION_SEND);
             mTextEntry.setInputType(inputTypeFlags);
+            mEnterSend = true;
         }
         else {
             inputTypeFlags = mTextEntry.getInputType() | InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE;
@@ -192,14 +195,19 @@ public class ComposerBar extends RelativeLayout implements
                     mSendButton.setVisibility(textPresent ? View.VISIBLE : View.INVISIBLE);
                 }
                 mSendButton.setEnabled(textPresent);
+
+                if (mListener != null)
+                    mListener.textChanged(s);
             }
         });
         mTextEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    InputMethodManager imm = (InputMethodManager) mContext
-                        .getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+                    if (!mEnterSend) {
+                        InputMethodManager imm = (InputMethodManager) mContext
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+                    }
                     submitSend();
                     return true;
                 }
@@ -223,6 +231,7 @@ public class ComposerBar extends RelativeLayout implements
             public void afterTextChanged(Editable s) {
             }
         };
+        mTextEntry.addTextChangedListener(mChatStateListener);
 
         mTextEntry.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -351,6 +360,9 @@ public class ComposerBar extends RelativeLayout implements
     }
 
     public void setRootView(View rootView) {
+        if (!(rootView instanceof KeyboardAwareRelativeLayout)) {
+            rootView = rootView.findViewById(R.id.root_view);
+        }
         mRootView = (KeyboardAwareRelativeLayout) rootView;
         // this will handle closing of keyboard while emoji drawer is open
         mRootView.setOnKeyboardShownListener(new KeyboardAwareRelativeLayout.OnKeyboardShownListener() {
@@ -361,6 +373,12 @@ public class ComposerBar extends RelativeLayout implements
                 }
             }
         });
+    }
+
+    public void forceHideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) mContext
+            .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mTextEntry.getApplicationWindowToken(), 0);
     }
 
     public void onSaveInstanceState(Bundle out) {
@@ -475,7 +493,7 @@ public class ComposerBar extends RelativeLayout implements
             // Start recording
             mRecord.start();
             mIsRecordingAudio = true;
-            lockOrientation();
+            lockScreen();
             disableTextEntry();
         }
         catch (IllegalStateException e) {
@@ -495,23 +513,28 @@ public class ComposerBar extends RelativeLayout implements
 
     private void stopRecording(boolean send) {
         mIsRecordingAudio = false;
-        unlockOrientation();
+        unlockScreen();
         enableTextEntry();
 
         mVibrator.vibrate(AUDIO_RECORD_VIBRATION);
         if (mMediaPlayerUpdater != null)
             mHandler.removeCallbacks(mMediaPlayerUpdater);
 
-        boolean canSend = send && (elapsedTime > MIN_RECORDING_TIME);
+        boolean minDuration = (elapsedTime > MIN_RECORDING_TIME);
+        boolean canSend = send && minDuration;
+        // reset elapsed recording time
+        elapsedTime = 0;
 
         try {
             if (mRecord != null) {
                 mRecord.stop();
-                mRecord.reset();
-                mRecord.release();
                 if (canSend) {
                     mListener.sendBinaryMessage(Uri.fromFile(mRecordFile),
                         AudioDialog.DEFAULT_MIME, true, AudioComponent.class);
+                }
+                else if (send) {
+                    Toast.makeText(mContext, R.string.hint_ptt,
+                        Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -520,12 +543,25 @@ public class ComposerBar extends RelativeLayout implements
             canSend = false;
         }
         catch (RuntimeException e) {
-            Log.w(TAG, "no audio data received", e);
+            if (send) {
+                int msgId;
+                if (!minDuration) {
+                    msgId = R.string.hint_ptt;
+                }
+                else {
+                    Log.w(TAG, "no audio data received", e);
+                    msgId = R.string.err_audio_record_noaudio;
+                }
+                Toast.makeText(mContext, msgId, Toast.LENGTH_LONG).show();
+            }
             canSend = false;
-            Toast.makeText(mContext, R.string.err_audio_record,
-                Toast.LENGTH_LONG).show();
         }
         finally {
+            if (mRecord != null) {
+                mRecord.reset();
+                mRecord.release();
+            }
+
             if (!canSend && mRecordFile != null)
                 mRecordFile.delete();
         }
@@ -541,16 +577,18 @@ public class ComposerBar extends RelativeLayout implements
         mRecordLayout.setVisibility(View.GONE);
     }
 
-    private void lockOrientation() {
+    private void lockScreen() {
         int orientation = SystemUtils.getScreenOrientation((Activity) mContext);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
             orientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED;
         //noinspection ResourceType
         ((Activity) mContext).setRequestedOrientation(orientation);
+        SystemUtils.acquireScreenOn((Activity) mContext);
     }
 
-    private void unlockOrientation() {
+    private void unlockScreen() {
         ((Activity) mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        SystemUtils.releaseScreenOn((Activity) mContext);
     }
 
     private void startTimer() {
@@ -586,6 +624,11 @@ public class ComposerBar extends RelativeLayout implements
         if (isEmojiVisible()) {
             hideEmojiDrawer();
         }
+    }
+
+    /** Returns true if typing message was sent. */
+    public boolean isComposeSent() {
+        return mComposeSent;
     }
 
     @Override

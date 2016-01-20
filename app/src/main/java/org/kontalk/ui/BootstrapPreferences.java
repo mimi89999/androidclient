@@ -18,16 +18,10 @@
 
 package org.kontalk.ui;
 
-import org.kontalk.R;
-import org.kontalk.service.msgcenter.PushServiceManager;
-
-import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.view.MenuItem;
+
+import org.kontalk.R;
 
 
 /**
@@ -35,37 +29,19 @@ import android.view.MenuItem;
  * @author Daniele Ricci
  * @version 1.0
  */
-public class BootstrapPreferences extends PreferenceActivity {
+public class BootstrapPreferences extends RootPreferenceFragment {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.bootstrap_preferences);
-
-        // disable push notifications if GCM is not available on the device
-        if (!PushServiceManager.getInstance(this).isServiceAvailable()) {
-            final Preference push = findPreference("pref_push_notifications");
-            push.setEnabled(false);
-        }
-
-        setupActivity();
-        PreferencesActivity.setupPreferences(this);
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void setupActivity() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ActionBar bar = getActionBar();
-            bar.setDisplayShowHomeEnabled(true);
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                getActivity().finish();
                 return true;
         }
 
